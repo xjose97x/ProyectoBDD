@@ -1,3 +1,19 @@
+USE master
+GO
+
+CREATE LOGIN administrador WITH PASSWORD = N'flicks4uEcuador2022'
+GO
+
+CREATE LOGIN gestorFunciones WITH PASSWORD = N'salasCineFlicks4uEcuador'
+GO
+
+CREATE LOGIN recursosHumanos WITH PASSWORD = N'recursosHumanosFlicks4UEcuador'
+GO
+
+CREATE LOGIN visualizadorReportes WITH PASSWORD = N'visulizadorFlicks4UEcuador'
+GO
+
+
 CREATE DATABASE Flicks4U
 GO
 
@@ -453,25 +469,6 @@ BEGIN
 		RAISERROR(@errorMessage, @errorSeverity, @errorState);
 	END CATCH
 END
-
--- Creación de logins para tres tipos de usuarios.
-USE master
-GO
-
-CREATE LOGIN administrador WITH PASSWORD = N'flicks4uEcuador2022'
-GO
-
-CREATE LOGIN gestorFunciones WITH PASSWORD = N'salasCineFlicks4uEcuador'
-GO
-
-CREATE LOGIN recursosHumanos WITH PASSWORD = N'recursosHumanosFlicks4UEcuador'
-GO
-
-CREATE LOGIN visualizadorReportes WITH PASSWORD = N'visulizadorFlicks4UEcuador'
-GO
-
--- Creación de usuarios a nivel de base de datos.
-Use Flicks4U
 GO
 
 CREATE USER [administrador] FOR LOGIN [administrador] WITH DEFAULT_SCHEMA=[dbo]
@@ -485,7 +482,6 @@ GO
 
 CREATE USER [visualizadorReportes] FOR LOGIN visualizadorReportes WITH DEFAULT_SCHEMA=[Reportes]
 GO
-
 
 -- Asignación de permiso a administrador como db_owner.
 EXEC sp_addrolemember N'db_owner', N'administrador'
