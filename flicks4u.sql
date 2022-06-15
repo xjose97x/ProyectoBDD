@@ -502,3 +502,21 @@ GRANT SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: RecursosHumanos
 TO RRHH
 GO
+
+
+CREATE TRIGGER NotificacionContratacion
+	ON RecursosHumanos.Empleado
+	FOR INSERT
+	AS
+	BEGIN
+		SET NOCOUNT ON;
+		DECLARE @email nvarchar(50)
+		SET @email = (SELECT INSERTED.Correo FROM INSERTED)
+		DECLARE @body NVARCHAR(80)
+		SET @body = CONCAT('Nuevo empleado contratado. Su correo es: ', @email)
+		EXEC msdb.dbo.sp_send_dbmail  @profile_name = 'DBA_Email_Profile',
+		  @recipients = 'joseignacioescudero@gmail.com', 
+		  @subject = 'Nuevo empleado contratado!', 
+		  @body = @body
+	END
+RETURN
