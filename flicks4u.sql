@@ -57,19 +57,6 @@ GO
 CREATE SCHEMA Reportes
 GO
 
-
-CREATE TABLE RecursosHumanos.HorarioLaboral
-(
-	EmpleadoId INT NOT NULL,
-	NumeroDia TINYINT NOT NULL,
-	HoraInicio TIME NULL,
-	HoraFin TIME NULL,
-	CONSTRAINT PK_HorarioLaboral PRIMARY KEY (EmpleadoId, NumeroDia),
-	CONSTRAINT ck_NumeroDia CHECK(NumeroDia BETWEEN 1 AND 7),
-	CONSTRAINT ck_Hora CHECK(HoraFin > HoraInicio)
-)
-GO
-
 CREATE TABLE RecursosHumanos.Empleado
 (
 	Id INT PRIMARY KEY IDENTITY (1, 1),
@@ -91,6 +78,18 @@ CREATE TABLE RecursosHumanos.Empleado
 	CONSTRAINT ck_nombres CHECK (LEN(Nombres) > 0),
 	CONSTRAINT ck_apellidos CHECK (LEN(Apellidos) > 0),
 	CONSTRAINT ck_direccion CHECK (LEN(Direccion) > 0)
+)
+GO
+
+CREATE TABLE RecursosHumanos.HorarioLaboral
+(
+	EmpleadoId INT NOT NULL FOREIGN KEY REFERENCES RecursosHumanos.Empleado(Id),
+	NumeroDia TINYINT NOT NULL,
+	HoraInicio TIME NULL,
+	HoraFin TIME NULL,
+	CONSTRAINT PK_HorarioLaboral PRIMARY KEY (EmpleadoId, NumeroDia),
+	CONSTRAINT ck_NumeroDia CHECK(NumeroDia BETWEEN 1 AND 7),
+	CONSTRAINT ck_Hora CHECK(HoraFin > HoraInicio)
 )
 GO
 
