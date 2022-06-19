@@ -1,3 +1,6 @@
+USE Flicks4U
+GO
+
 EXEC InsertarPelicula_SP 'Up', 'Un hombre amargado le cuelga globos a su casa y viaja a Sudamérica', 'Comedia', '01:47:00', 'https://disney.com/up/up.jpg', 'digital', '2010-05-05', '2010-07-05'
 EXEC InsertarPelicula_SP 'Jurassic World: Dominion', 'La última parte en la saga épica de Jurassic Park', 'Aventura', '02:31:00', 'https://universalapi.com/jurassicworld/dominion/poster.jpg', 'digital', '2022-04-07', '2022-06-07'
 EXEC InsertarPelicula_SP 'Men', 'Una mujer tiene experiencias extrañas cuando se va de vacaciones para recuperarse de una tragedia', 'Terror', '02:01:00', 'https://a24api.com/men/men.jpg', '35mm', '2022-06-05', '2022-08-05'
@@ -29,3 +32,9 @@ EXEC CrearSala_SP 90, 'VBOX', 'D'
 
 EXEC Insertar_Empleado_SP '1700000000', 'Pepito', 'De Los Palotes', 'pepito@delospalotes.com', '+593 4512312', 'M', '2000-01-01', 'Av. Granados E4-12', 450.00, 'Limpieza'
 EXEC Insertar_Empleado_SP '1200000000', 'Juan Carlos', 'Bodoque', 'juancarlos@bodoque.com', '+593 987654421', 'M', '1997-01-01', 'Av. Amazonas E4-12', 700.00, 'Proyeccion'
+
+--Inserción de funciones
+EXEC CrearFuncion_SP '20220619 10:30:00 AM', 1, 1, 1, 2
+--EXEC CrearFuncion_SP '20220622 10:30:00 AM', 1, 1, 1, 2 --TODO: Bug al insertar funciones a la misma hora en dias diferentes
+
+EXEC CrearFuncion_SP '20220619 01:30:00 PM', 1, 1, 1, 2
