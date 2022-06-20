@@ -31,10 +31,17 @@ EXEC CrearSala_SP 100, 'VBOX', 'D'
 EXEC CrearSala_SP 90, 'VBOX', 'D'
 
 EXEC Insertar_Empleado_SP '1700000000', 'Pepito', 'De Los Palotes', 'pepito@delospalotes.com', '+593 4512312', 'M', '2000-01-01', 'Av. Granados E4-12', 450.00, 'Limpieza'
+EXEC Insertar_Empleado_SP '1700000002', 'Patricio', 'Estrella', 'patricioe@gmail.com', '+593 4512232', 'M', '1997-01-16', 'Av. La Prensa E4-12', 500.00, 'Limpieza'
+
 EXEC Insertar_Empleado_SP '1200000000', 'Juan Carlos', 'Bodoque', 'juancarlos@bodoque.com', '+593 987654421', 'M', '1997-01-01', 'Av. Amazonas E4-12', 700.00, 'Proyeccion'
+EXEC Insertar_Empleado_SP '1200000003', 'Miguel', 'Brito', 'miguelb@gmail.com', '+593 98123451', 'M', '2000-12-12', 'Av. 10 de Agosto E4-12', 800.00, 'Proyeccion'
+
 
 --Inserción de funciones
 EXEC CrearFuncion_SP '20220619 10:30:00 AM', 1, 1, 1, 2
 --EXEC CrearFuncion_SP '20220622 10:30:00 AM', 1, 1, 1, 2 --TODO: Bug al insertar funciones a la misma hora en dias diferentes
 
 EXEC CrearFuncion_SP '20220619 01:30:00 PM', 1, 1, 1, 2
+
+EXEC CrearFuncion_SP '20220619 01:30:00 PM', 2, 2, 4, 5
+EXEC CrearFuncion_SP '20220619 03:30:00 PM', 2, 2, 4, 5
