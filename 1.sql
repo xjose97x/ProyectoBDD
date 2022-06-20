@@ -59,77 +59,86 @@ GO
 
 CREATE TABLE RecursosHumanos.Empleado
 (
-	Id INT PRIMARY KEY IDENTITY (1, 1),
-	Dni VARCHAR(10) NOT NULL UNIQUE,
+	Id SMALLINT IDENTITY (1, 1),
+	DNI VARCHAR(10) NOT NULL UNIQUE,
 	Nombres NVARCHAR(30) NOT NULL,
 	Apellidos NVARCHAR(30) NOT NULL,
 	Correo email NOT NULL UNIQUE,
 	Telefono phoneNumber NOT NULL,
 	Genero gender NOT NULL,
 	FechaNacimiento DATE NOT NULL,
-	FechaIngreso DATE NOT NULL,
+	FechaIngreso DATE NOT NULL DEFAULT GETDATE(),
 	Direccion NVARCHAR(100) NOT NULL,
 	FechaEgreso DATE NULL,
 	Salario SMALLMONEY NOT NULL,
 	Tipo varchar(45) NOT NULL,
-	CONSTRAINT ck_salario CHECK (Salario > 0),
-	CONSTRAINT ck_fechaNacimiento CHECK (FechaNacimiento < GETDATE()),
-	CONSTRAINT ck_tipo CHECK (Tipo IN ('Limpieza', 'Proyeccion')),
-	CONSTRAINT ck_nombres CHECK (LEN(Nombres) > 0),
-	CONSTRAINT ck_apellidos CHECK (LEN(Apellidos) > 0),
-	CONSTRAINT ck_direccion CHECK (LEN(Direccion) > 0)
+	CONSTRAINT CK_salario CHECK (Salario > 0),
+	CONSTRAINT CK_fechaNacimiento CHECK (FechaNacimiento < GETDATE() AND DATEDIFF(YEAR, FechaNacimiento, GETDATE()) >= 18),
+	CONSTRAINT CK_tipo CHECK (Tipo IN ('Limpieza', 'Proyeccion')),
+	CONSTRAINT CK_nombres CHECK (LEN(Nombres) > 0 AND ISNUMERIC(Nombres) = 0),
+	CONSTRAINT CK_apellidos CHECK (LEN(Apellidos) > 0 AND ISNUMERIC(Apellidos) = 0),
+	CONSTRAINT CK_direccion CHECK (LEN(Direccion) > 0),
+	CONSTRAINT PK_Empleado PRIMARY KEY (Id)
 )
 GO
 
 CREATE TABLE RecursosHumanos.HorarioLaboral
 (
-	EmpleadoId INT NOT NULL FOREIGN KEY REFERENCES RecursosHumanos.Empleado(Id),
+	EmpleadoId SMALLINT NOT NULL,
 	NumeroDia TINYINT NOT NULL,
 	HoraInicio TIME NULL,
 	HoraFin TIME NULL,
 	CONSTRAINT PK_HorarioLaboral PRIMARY KEY (EmpleadoId, NumeroDia),
-	CONSTRAINT ck_NumeroDia CHECK(NumeroDia BETWEEN 1 AND 7),
-	CONSTRAINT ck_Hora CHECK(HoraFin > HoraInicio)
+	CONSTRAINT CK_NumeroDia CHECK(NumeroDia BETWEEN 1 AND 7),
+	CONSTRAINT CK_Hora CHECK(HoraFin > HoraInicio),
+	CONSTRAINT FK_Empleado FOREIGN KEY (EmpleadoId) REFERENCES RecursosHumanos.Empleado(Id)
 )
 GO
 
 CREATE TABLE Funciones.Pelicula
 (
-	Id int PRIMARY KEY identity (1,1),
-	Nombre nvarchar(100) NOT NULL,
-	Sinopsis Text NOT NULL,
-	Genero varchar(14) NOT NULL,
-	Duracion time(0) NOT NULL,
-	ImagenUrl varchar(100) NOT NULL,
-	Formato varchar(10) NOT NULL,
+	Id INT IDENTITY (1,1),
+	Nombre NVARCHAR(100) NOT NULL,
+	Sinopsis TEXT NOT NULL,
+	Genero VARCHAR(14) NOT NULL,
+	Duracion TIME(0) NOT NULL,
+	ImagenUrl VARCHAR(100) NOT NULL,
+	Formato VARCHAR(10) NOT NULL,
 	FechaEstreno DATE NOT NULL,
 	FechaSalidaCartelera DATE NOT NULL,
 	CONSTRAINT CK_Formato CHECK (Formato IN ('35mm', '16mm', 'digital', 'IMAX','digital3D')),
 	CONSTRAINT CK_Genero CHECK (Genero IN ('Aventura', 'Terror', 'Comedia', 'Drama', 'Acción', 'Sci-fi')),
-	CONSTRAINT CK_FechaSalidaCartelera CHECK (FechaSalidaCartelera > FechaEstreno AND datediff(MONTH, FechaEstreno, FechaSalidaCartelera) = 2)
+	CONSTRAINT CK_FechaSalidaCartelera CHECK (FechaSalidaCartelera > FechaEstreno AND datediff(MONTH, FechaEstreno, FechaSalidaCartelera) = 2),
+	CONSTRAINT PK_Pelicula PRIMARY KEY (Id)
 )
 GO
 
 CREATE TABLE Funciones.Sala
 (
-	Id INT PRIMARY KEY identity (1,1),
+	Id TINYINT IDENTITY (1,1),
 	Aforo TINYINT NOT NULL,
 	TipoSala VARCHAR(4) NOT NULL,
 	TipoProyector CHAR(1) NOT NULL,
-	CONSTRAINT ck_TipoSala CHECK (TipoSala IN ('REG', '3D', '4D', 'VBOX')),
-	CONSTRAINT ck_Equipo CHECK (TipoProyector IN ('D', 'A'))
+	CONSTRAINT CK_TipoSala CHECK (TipoSala IN ('REG', '3D', '4D', 'VBOX')),
+	CONSTRAINT CK_Equipo CHECK (TipoProyector IN ('D', 'A')),
+	CONSTRAINT PK_Sala PRIMARY KEY (Id)
 )
 GO
 
 CREATE TABLE Funciones.Funcion
 (
-	Id INT PRIMARY KEY identity (1,1),
+	Id INT identity (1,1),
 	FechaInicio DATETIME,
 	FechaFin DATETIME, --Duracion Pelicula + 5 min Anuncios + 30 min limpieza
-	PeliculaId INT NOT NULL FOREIGN KEY REFERENCES Funciones.Pelicula(Id),
-	SalaId INT NOT NULL FOREIGN KEY REFERENCES Funciones.Sala(Id),
-	EmpleadoLimpiezaId INT NOT NULL FOREIGN KEY REFERENCES RecursosHumanos.Empleado(Id),
-	EmpleadoProyecionId INT NOT NULL FOREIGN KEY REFERENCES RecursosHumanos.Empleado(Id)
+	EmpleadoLimpiezaId SMALLINT NOT NULL,
+	EmpleadoProyecionId SMALLINT NOT NULL,
+	PeliculaId INT NOT NULL,
+	SalaId TINYINT NOT NULL,
+	CONSTRAINT PK_Funcion PRIMARY KEY (Id),
+	CONSTRAINT FK_Pelicula FOREIGN KEY (PeliculaId) REFERENCES Funciones.Pelicula(Id),
+	CONSTRAINT FK_Sala FOREIGN KEY (SalaId) REFERENCES Funciones.Sala(Id),
+	CONSTRAINT FK_EmpleadoLimpieza FOREIGN KEY (EmpleadoLimpiezaId) REFERENCES RecursosHumanos.Empleado(Id),
+	CONSTRAINT FK_EmpleadoProyeccion FOREIGN KEY (EmpleadoProyecionId) REFERENCES RecursosHumanos.Empleado(Id),
 )
 GO
 
