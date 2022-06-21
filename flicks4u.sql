@@ -151,7 +151,7 @@ BEGIN
 		IF @AFORO < 10
 			THROW 60000, 'El aforo minimo es de 10 personas.', 1; 
 		ELSE
-			INSERT INTO Sala(Aforo, TipoSala, TipoProyector)
+			INSERT INTO Funciones.Sala(Aforo, TipoSala, TipoProyector)
 			VALUES(@AFORO, @TIPO_SALA, @TIPO_PROYECTOR)
 			SET @NewId = SCOPE_IDENTITY();
 	END TRY
@@ -178,7 +178,7 @@ AS
 		IF (@Duracion > @CondicionDuracion)
 			THROW 60000, 'La duración excede el tiempo permitido.', 1; 
 		ELSE
-			INSERT INTO Pelicula (Nombre, Sinopsis, Genero, Duracion, ImagenUrl, Formato, FechaEstreno, FechaSalidaCartelera)
+			INSERT INTO Funciones.Pelicula (Nombre, Sinopsis, Genero, Duracion, ImagenUrl, Formato, FechaEstreno, FechaSalidaCartelera)
 			VALUES (@Nombre, @Sinopsis, @Genero, @Duracion, @ImagenUrl, @Formato, @FechaEstreno, @FechaSalidaCartelera)
 			SET @NewId = SCOPE_IDENTITY();
 	END TRY
@@ -203,10 +203,10 @@ BEGIN
 	SET NOCOUNT ON
     BEGIN TRY
 		--VALIDAR SI EXISTE SALA--
-		IF NOT EXISTS(SELECT * FROM Sala WHERE Id = @ID_SALA)
+		IF NOT EXISTS(SELECT * FROM Funciones.Sala WHERE Id = @ID_SALA)
 			THROW 60000, 'La sala no existe.', 1; 
 		ELSE
-			IF EXISTS (SELECT * FROM Funcion
+			IF EXISTS (SELECT * FROM Funciones.Funcion
 						WHERE SalaId = @ID_SALA
 						AND @FECHA_INICIO >= FechaInicio AND @FECHA_FIN <= FechaFin)
 				SET @resultado = 'No disponible'
@@ -234,7 +234,7 @@ AS
 BEGIN
 	SET NOCOUNT ON
     BEGIN TRY
-		IF NOT EXISTS(SELECT * FROM Empleado WHERE Id = @ID_EMPLEADO)
+		IF NOT EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @ID_EMPLEADO)
 			THROW 60000, 'El empleado no existe', 1; 
 		ELSE
 			--VALIDAR SI EMPLEADO SE ENCUENTRA EN HORARIO LABORAL--
@@ -243,11 +243,11 @@ BEGIN
 		
 			DECLARE @horaInicio TIME(0)
 			DECLARE @horaFin TIME(0)
-			SET @horaInicio = (SELECT HoraInicio FROM HorarioLaboral WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
-			SET @horaFin = (SELECT HoraFin FROM HorarioLaboral WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
+			SET @horaInicio = (SELECT HoraInicio FROM RecursosHumanos.HorarioLaboral WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
+			SET @horaFin = (SELECT HoraFin FROM RecursosHumanos.HorarioLaboral WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
 
 			IF (@horaInicio < CONVERT(TIME, @FECHA_INICIO) OR @horaFin < CONVERT(TIME, @FECHA_FIN)) OR
-				EXISTS (SELECT * FROM Funcion
+				EXISTS (SELECT * FROM Funciones.Funcion
 							WHERE (EmpleadoLimpiezaId = @ID_EMPLEADO OR EmpleadoProyecionId = @ID_EMPLEADO)
 							AND @FECHA_INICIO >= FechaInicio AND @FECHA_FIN <= FechaFin)
 				SET @resultado = 'No disponible'
@@ -278,18 +278,18 @@ AS
 BEGIN
 	SET NOCOUNT ON
     BEGIN TRY
-		IF NOT EXISTS(SELECT * FROM Pelicula WHERE Id = @PELICULA_ID)
+		IF NOT EXISTS(SELECT * FROM Funciones.Pelicula WHERE Id = @PELICULA_ID)
 			THROW 60000, 'La pelicula no existe', 1; 
-		ELSE IF NOT EXISTS (SELECT * FROM Sala WHERE Id = @SALA_ID)
+		ELSE IF NOT EXISTS (SELECT * FROM Funciones.Sala WHERE Id = @SALA_ID)
 			THROW 60000, 'La sala no existe', 1; 
-		ELSE IF NOT EXISTS(SELECT * FROM Empleado WHERE id = @EMPLEADO_LIMPIEZA_ID)
+		ELSE IF NOT EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE id = @EMPLEADO_LIMPIEZA_ID)
 			THROW 60000, 'El empleado de limpieza no existe', 1; 
-		ELSE IF NOT EXISTS(SELECT * FROM Empleado WHERE id = @EMPLEADO_PROYECTOR_ID)
+		ELSE IF NOT EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE id = @EMPLEADO_PROYECTOR_ID)
 			THROW 60000, 'El empleado de proyeccion no existe', 1; 
 		ELSE
 			DECLARE @fechaFin DATETIME
 			SET @fechaFin = @FECHA_INICIO +
-							CAST((SELECT Duracion FROM Pelicula WHERE Id = @PELICULA_ID) as datetime) +
+							CAST((SELECT Duracion FROM Funciones.Pelicula WHERE Id = @PELICULA_ID) as datetime) +
 							CAST('00:35:00' as datetime)
 			DECLARE @estadoSala VARCHAR(15)
 			EXEC ObtenerEstadoSala_SP @SALA_ID, @FECHA_INICIO, @fechaFin, @estadoSala OUTPUT
@@ -308,7 +308,7 @@ BEGIN
 			ELSE IF @estadoEmpleadoProyeccion = 'No disponible'
 				THROW 60000, 'El empleado de proyeccion no se encuentra disponible.', 1; 
 			ELSE
-				INSERT INTO Funcion (FechaInicio, FechaFin, PeliculaId, SalaId, EmpleadoLimpiezaId, EmpleadoProyecionId)
+				INSERT INTO Funciones.Funcion (FechaInicio, FechaFin, PeliculaId, SalaId, EmpleadoLimpiezaId, EmpleadoProyecionId)
 					VALUES (@FECHA_INICIO, @fechaFin, @PELICULA_ID, @SALA_ID, @EMPLEADO_LIMPIEZA_ID,@EMPLEADO_PROYECTOR_ID)
 				SET @NewId = SCOPE_IDENTITY();
 	END TRY
@@ -336,7 +336,7 @@ AS
 BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON
-		INSERT INTO HorarioLaboral(EmpleadoId, NumeroDia, HoraInicio, HoraFin)
+		INSERT INTO RecursosHumanos.HorarioLaboral(EmpleadoId, NumeroDia, HoraInicio, HoraFin)
 		VALUES (@IdEmpleado, @NumeroDia, @HoraInicio, @HoraFin)
 	END TRY
 	BEGIN CATCH
@@ -369,7 +369,7 @@ AS
 BEGIN
 	SET NOCOUNT ON
 	BEGIN TRY
-		INSERT INTO Empleado
+		INSERT INTO RecursosHumanos.Empleado
 		( Dni, Nombres, Apellidos, Correo, Telefono, Genero, FechaNacimiento,
 		  FechaIngreso, Direccion, Salario, Tipo)
 		VALUES
@@ -406,12 +406,12 @@ AS
 BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON
-		IF NOT EXISTS(SELECT * FROM Empleado WHERE Id = @IdEmpleado)
+		IF NOT EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @IdEmpleado)
 			THROW 60000, 'El empleado no existe.', 1; 
-		ELSE IF EXISTS(SELECT * FROM Empleado WHERE Id = @IdEmpleado AND FechaEgreso IS NULL)
+		ELSE IF EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @IdEmpleado AND FechaEgreso IS NULL)
 			THROW 60000, 'El empleado ya fue despedido.', 1; 
 		ELSE
-			UPDATE Empleado
+			UPDATE RecursosHumanos.Empleado
 			SET FechaEgreso = GETDATE()
 			WHERE Id = @IdEmpleado
 	END TRY
@@ -427,7 +427,7 @@ BEGIN
 END
 GO
 
-CREATE PROC ModificarEmpleado
+CREATE PROC ModificarEmpleado_SP
 (
 	@EmpleadoId INT,
 	@Dni VARCHAR(10),
@@ -446,7 +446,7 @@ CREATE PROC ModificarEmpleado
 AS
 BEGIN
 	BEGIN TRY
-		UPDATE Empleado
+		UPDATE RecursosHumanos.Empleado
 		SET Dni = @Dni,
 			Nombres = @Nombres,
 			Apellidos = @Apellidos,
