@@ -1,4 +1,4 @@
-CREATE PROC Funciones.ObtenerEstadoSala_SP
+CREATE PROC Funciones.Obtener_Estado_Sala_SP
     (@ID_SALA INT,
 	 @FECHA_INICIO DATETIME,
 	 @FECHA_FIN DATETIME,
@@ -30,8 +30,8 @@ BEGIN
 END
 GO
 
-CREATE PROC ObtenerEstadoEmpleado_SP
-    (@ID_EMPLEADO INT,
+CREATE PROC Funciones.Obtener_Estado_Empleado_SP
+    (@ID_EMPLEADO SMALLINT,
 	 @FECHA_INICIO DATETIME,
 	 @FECHA_FIN DATETIME,
 	 @RESULTADO varchar(15) OUTPUT)
@@ -39,7 +39,7 @@ AS
 BEGIN
 	SET NOCOUNT ON
     BEGIN TRY
-		IF NOT EXISTS(SELECT * FROM Empleado WHERE Id = @ID_EMPLEADO)
+		IF NOT EXISTS(SELECT * FROM Funciones.EmpleadoParaGestor WHERE Id = @ID_EMPLEADO)
 			THROW 60000, 'El empleado no existe', 1; 
 		ELSE
 			--VALIDAR SI EMPLEADO SE ENCUENTRA EN HORARIO LABORAL--
@@ -48,8 +48,8 @@ BEGIN
 		
 			DECLARE @horaInicio TIME(0)
 			DECLARE @horaFin TIME(0)
-			SET @horaInicio = (SELECT HoraInicio FROM HorarioLaboral WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
-			SET @horaFin = (SELECT HoraFin FROM HorarioLaboral WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
+			SET @horaInicio = (SELECT HoraInicio FROM Funciones.HorarioEmpleadoParaGestor WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
+			SET @horaFin = (SELECT HoraFin FROM Funciones.HorarioEmpleadoParaGestor WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
 
 			IF (@horaInicio < CONVERT(TIME, @FECHA_INICIO) OR @horaFin < CONVERT(TIME, @FECHA_FIN)) OR
 				EXISTS (SELECT * FROM Funciones.Funcion
@@ -72,12 +72,12 @@ END
 GO
 
 
-CREATE PROC Funciones.ProgramarFuncion_SP
+CREATE PROC Funciones.Crear_Funcion_SP
     (@FECHA_INICIO DATETIME,
 	@PELICULA_ID INT,
-	@SALA_ID INT,
-	@EMPLEADO_LIMPIEZA_ID INT,
-	@EMPLEADO_PROYECTOR_ID INT,
+	@SALA_ID TINYINT,
+	@EMPLEADO_LIMPIEZA_ID SMALLINT,
+	@EMPLEADO_PROYECTOR_ID SMALLINT,
 	@NewId INT = NULL OUTPUT)
 AS
 BEGIN
@@ -97,14 +97,13 @@ BEGIN
 							CAST((SELECT Duracion FROM Funciones.Pelicula WHERE Id = @PELICULA_ID) as datetime) +
 							CAST('00:35:00' as datetime)
 			DECLARE @estadoSala VARCHAR(15)
-			EXEC ObtenerEstadoSala_SP @SALA_ID, @FECHA_INICIO, @fechaFin, @estadoSala OUTPUT
+			EXEC Funciones.Obtener_Estado_Sala_SP @SALA_ID, @FECHA_INICIO, @fechaFin, @estadoSala OUTPUT
 
 			DECLARE @estadoEmpleadoLimpieza VARCHAR(15)
-			EXEC ObtenerEstadoEmpleado_SP @EMPLEADO_LIMPIEZA_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoLimpieza OUTPUT
+			EXEC Funciones.Obtener_Estado_Empleado_SP @EMPLEADO_LIMPIEZA_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoLimpieza OUTPUT
 
 			DECLARE @estadoEmpleadoProyeccion VARCHAR(15)
-			EXEC ObtenerEstadoEmpleado_SP @EMPLEADO_PROYECTOR_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoProyeccion OUTPUT
-
+			EXEC Funciones.Obtener_Estado_Empleado_SP @EMPLEADO_PROYECTOR_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoProyeccion OUTPUT
 
 			IF @estadoSala = 'No disponible'
 				THROW 60000, 'La sala no se encuentra disponible.', 1; 
@@ -129,7 +128,7 @@ BEGIN
 END
 GO
 
-CREATE PROC RecursosHumanos.DespedirEmpleado_SP
+CREATE PROC RecursosHumanos.Despedir_Empleado_SP
 (
 	@IdEmpleado INT
 )

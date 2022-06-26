@@ -145,7 +145,13 @@ GO
 CREATE SYNONYM EmpleadoParaGestor FOR RecursosHumanos.Empleado
 GO
 
+CREATE SYNONYM HorarioEmpleadoParaGestor FOR RecursosHumanos.HorarioLaboral
+GO
+
 ALTER SCHEMA Funciones TRANSFER OBJECT :: EmpleadoParaGestor
+GO
+
+ALTER SCHEMA Funciones TRANSFER OBJECT :: HorarioEmpleadoParaGestor
 GO
 
 
@@ -171,12 +177,32 @@ ON SCHEMA :: Funciones
 TO gestorFunciones
 GO
 
+DENY SELECT, INSERT, DELETE, UPDATE
+ON SCHEMA :: Funciones
+TO RRHH
+CASCADE
+GO
+
 -- Asignación de permisos a sinónimo para gestor de funciones.
 GRANT SELECT ON Funciones.EmpleadoParaGestor TO gestorFunciones
+GO
+
+DENY SELECT ON Funciones.EmpleadoParaGestor TO RRHH
+GO
+
+GRANT SELECT ON Funciones.HorarioEmpleadoParaGestor TO gestorFunciones
+GO
+
+DENY SELECT ON Funciones.HorarioEmpleadoParaGestor TO RRHH
 GO
 
 -- Asignación de permisos a gestor de recursos humanos.
 GRANT SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: RecursosHumanos
 TO RRHH
+GO
+
+DENY SELECT, INSERT, DELETE, UPDATE
+ON SCHEMA :: RecursosHumanos
+TO gestorFunciones
 GO

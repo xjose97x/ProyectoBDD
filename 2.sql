@@ -1,8 +1,12 @@
+USE Flicks4U
+GO
+
+
 CREATE PROCEDURE Funciones.Crear_Sala_SP
     (@AFORO TINYINT,
     @TIPO_SALA VARCHAR(4),
 	@TIPO_PROYECTOR CHAR(1),
-	@NewId INT = NULL OUTPUT)
+	@NewId TINYINT = NULL OUTPUT)
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -25,6 +29,7 @@ BEGIN
 	END CATCH
 END
 GO
+
 
 CREATE PROCEDURE Funciones.Insertar_Pelicula_SP
 (@Nombre nvarchar(100), @Sinopsis Text, @Genero varchar(14), @Duracion time(0), @ImagenUrl varchar(100),
@@ -55,9 +60,9 @@ GO
 CREATE PROC Funciones.Crear_Funcion_SP
     (@FECHA_INICIO DATETIME,
 	@PELICULA_ID INT,
-	@SALA_ID INT,
-	@EMPLEADO_LIMPIEZA_ID INT,
-	@EMPLEADO_PROYECTOR_ID INT,
+	@SALA_ID TINYINT,
+	@EMPLEADO_LIMPIEZA_ID SMALLINT,
+	@EMPLEADO_PROYECTOR_ID SMALLINT,
 	@NewId INT = NULL OUTPUT)
 AS
 BEGIN
@@ -77,13 +82,13 @@ BEGIN
 							CAST((SELECT Duracion FROM Funciones.Pelicula WHERE Id = @PELICULA_ID) as datetime) +
 							CAST('00:35:00' as datetime)
 			DECLARE @estadoSala VARCHAR(15)
-			EXEC ObtenerEstadoSala_SP @SALA_ID, @FECHA_INICIO, @fechaFin, @estadoSala OUTPUT
+			EXEC Funciones.Obtener_Estado_Sala_SP @SALA_ID, @FECHA_INICIO, @fechaFin, @estadoSala OUTPUT
 
 			DECLARE @estadoEmpleadoLimpieza VARCHAR(15)
-			EXEC ObtenerEstadoEmpleado_SP @EMPLEADO_LIMPIEZA_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoLimpieza OUTPUT
+			EXEC Funciones.Obtener_Estado_Empleado_SP @EMPLEADO_LIMPIEZA_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoLimpieza OUTPUT
 
 			DECLARE @estadoEmpleadoProyeccion VARCHAR(15)
-			EXEC ObtenerEstadoEmpleado_SP @EMPLEADO_PROYECTOR_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoProyeccion OUTPUT
+			EXEC Funciones.Obtener_Estado_Empleado_SP @EMPLEADO_PROYECTOR_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoProyeccion OUTPUT
 
 			IF @estadoSala = 'No disponible'
 				THROW 60000, 'La sala no se encuentra disponible.', 1; 
@@ -109,9 +114,9 @@ END
 GO
 
 
-CREATE PROC RecursosHumanos.Insertar_Horario_Laboral_SP
+CREATE PROC RecursosHumanos.Insertar_HorarioLaboral_SP
 (
-	@IdEmpleado INT,
+	@IdEmpleado SMALLINT,
 	@NumeroDia TINYINT,
 	@HoraInicio TIME,
 	@HoraFin TIME
@@ -147,7 +152,7 @@ CREATE PROCEDURE RecursosHumanos.Insertar_Empleado_SP
 	@direccion NVARCHAR(100),
 	@salario SMALLMONEY,
 	@tipo VARCHAR(45),
-	@NewId INT = NULL OUTPUT
+	@NewId SMALLINT = NULL OUTPUT
 )
 AS
 BEGIN
@@ -161,13 +166,13 @@ BEGIN
 			GETDATE(), @direccion, @salario, @tipo )
 		SET @NewId = SCOPE_IDENTITY();
 
-		EXEC Insertar_HorarioLaboral_SP @NewId, 1, NULL, NULL
-		EXEC Insertar_HorarioLaboral_SP @NewId, 2, '08:00:00', '16:00:00'
-		EXEC Insertar_HorarioLaboral_SP @NewId, 3, '08:00:00', '16:00:00'
-		EXEC Insertar_HorarioLaboral_SP @NewId, 4, '08:00:00', '16:00:00'
-		EXEC Insertar_HorarioLaboral_SP @NewId, 5, '08:00:00', '16:00:00'
-		EXEC Insertar_HorarioLaboral_SP @NewId, 6, '08:00:00', '16:00:00'
-		EXEC Insertar_HorarioLaboral_SP @NewId, 7, NULL, NULL
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 1, NULL, NULL
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 2, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 3, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 4, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 5, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 6, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 7, NULL, NULL
 
 	END TRY
 	BEGIN CATCH
