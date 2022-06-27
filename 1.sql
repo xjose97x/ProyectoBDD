@@ -29,6 +29,7 @@ BEGIN
 	DROP DATABASE Flicks4U
 END
 GO
+
 CREATE DATABASE Flicks4U
 GO
 
@@ -36,55 +37,64 @@ USE Flicks4U
 GO
 
 -- **** CREACIÓN DE TIPOS DE DATOS Y REGLAS ****
+
 -- Creación de tipo de dato email
-CREATE TYPE dbo.email
+IF (TYPE_ID('email') IS NOT NULL)
+    DROP TYPE email
+GO
+
+CREATE TYPE email
 FROM nvarchar(50) NOT NULL
 GO
 Create Rule ck_email
 as @email LIKE '%@%.%'
 GO
-sp_bindrule ck_email,'dbo.email'
+sp_bindrule ck_email,'email'
 GO
 
 --Creación de tipo de dato phoneNumber
-CREATE TYPE dbo.phoneNumber
+IF (TYPE_ID('phoneNumber') IS NOT NULL)
+    DROP TYPE phoneNumber
+GO
+
+CREATE TYPE phoneNumber
 FROM nvarchar(50) NOT NULL
 GO
 Create Rule ck_phoneNumber
 as @phoneNumber LIKE '+%[0-9]% %[0-9]%'
 GO
-sp_bindrule ck_phoneNumber,'dbo.phoneNumber'
+sp_bindrule ck_phoneNumber,'phoneNumber'
 GO
 
 --Creación de tipo de dato gender
-CREATE TYPE dbo.gender
+IF (TYPE_ID('gender') IS NOT NULL)
+    DROP TYPE phoneNumber
+GOIF (TYPE_ID('gender') IS NOT NULL)
+    DROP TYPE phoneNumber
+GO
+
+CREATE TYPE gender
 FROM char(1) NOT NULL
 GO
 Create Rule ck_gender
 as @gender IN ('M', 'F', 'O')
 GO
-sp_bindrule ck_gender,'dbo.gender'
+sp_bindrule ck_gender,'gender'
 GO
 
 --Creación de Esquema RecursosHumanos
 IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'RecursosHumanos')
-BEGIN
     EXEC( 'CREATE SCHEMA RecursosHumanos' );
-END
 GO
 
 --Creación de Esquema Funciones
 IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'Funciones')
-BEGIN
 	EXEC( 'CREATE SCHEMA Funciones' );
-END
 GO
 
 --Creación de Esquema Reportes
 IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'Reportes')
-BEGIN
 	EXEC( 'CREATE SCHEMA Reportes' );
-END
 GO
 
 -- **** CREACIÓN DE TABLAS ****
@@ -189,13 +199,21 @@ CREATE TABLE Funciones.Funcion
 GO
 
 -- Creación de Sinónimo EmpleadoParaGestor
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'EmpleadoParaGestor')
+	DROP SYNONYM EmpleadoParaGestor
 CREATE SYNONYM EmpleadoParaGestor FOR RecursosHumanos.Empleado
 GO
 
+ALTER SCHEMA Funciones TRANSFER OBJECT :: EmpleadoParaGestor
+GO
+
+-- Creación de Sinónimo HorarioEmpleadoParaGestor
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'HorarioEmpleadoParaGestor')
+	DROP SYNONYM HorarioEmpleadoParaGestor
 CREATE SYNONYM HorarioEmpleadoParaGestor FOR RecursosHumanos.HorarioLaboral
 GO
 
-ALTER SCHEMA Funciones TRANSFER OBJECT :: EmpleadoParaGestor
+ALTER SCHEMA Funciones TRANSFER OBJECT :: HorarioEmpleadoParaGestor
 GO
 
 -- **** CREACIÓN DE USUARIOS ****
@@ -204,7 +222,6 @@ IF DATABASE_PRINCIPAL_ID('administrador') IS NULL
 BEGIN
     CREATE USER [administrador] FOR LOGIN [administrador] WITH DEFAULT_SCHEMA=[dbo]
 END
-ALTER SCHEMA Funciones TRANSFER OBJECT :: HorarioEmpleadoParaGestor
 GO
 
 -- Creación de usuario gestorFunciones
