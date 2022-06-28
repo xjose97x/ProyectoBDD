@@ -153,7 +153,7 @@ BEGIN
 		IF NOT EXISTS(SELECT * FROM Funciones.EmpleadoParaGestor WHERE Id = @ID_EMPLEADO)
 			THROW 60000, 'El empleado no existe', 1; 
 		ELSE
-			--VALIDAR SI EMPLEADO SE ENCUENTRA EN HORARIO LABORAL--
+			--VALIDAR SI EMPLEADO SE ENCUENTRA EN HORARIO LABORAL
 			DECLARE @dayNumber INT
 			SET @dayNumber = (SELECT DATEPART(WEEKDAY, @FECHA_INICIO))
 		
@@ -161,14 +161,14 @@ BEGIN
 			DECLARE @horaFin TIME(0)
 			SET @horaInicio = (SELECT HoraInicio FROM Funciones.HorarioEmpleadoParaGestor WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
 			SET @horaFin = (SELECT HoraFin FROM Funciones.HorarioEmpleadoParaGestor WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
-
-			IF (@horaInicio < CONVERT(TIME, @FECHA_INICIO) OR @horaFin < CONVERT(TIME, @FECHA_FIN)) OR
-				EXISTS (SELECT * FROM Funciones.Funcion
-							WHERE (EmpleadoLimpiezaId = @ID_EMPLEADO OR EmpleadoProyecionId = @ID_EMPLEADO)
-							AND @FECHA_INICIO >= FechaInicio AND @FECHA_FIN <= FechaFin)
-				SET @resultado = 'No disponible'
+			
+			IF (CONVERT(TIME(0), @FECHA_INICIO) > @horaInicio AND  CONVERT(TIME(0), @FECHA_FIN) < @horaFin)
+				AND NOT EXISTS (SELECT * FROM Funciones.Funcion
+								WHERE (EmpleadoLimpiezaId = @ID_EMPLEADO OR EmpleadoProyecionId = @ID_EMPLEADO)
+								AND @FECHA_INICIO >= FechaInicio AND @FECHA_FIN <= FechaFin)
+				SET @RESULTADO = 'Disponible'
 			ELSE
-				SET @resultado = 'Disponible'
+				SET @RESULTADO = 'No disponible'
 	END TRY
 	BEGIN CATCH
 		PRINT N'Error al intentar obtener el estado de [Empleado]'

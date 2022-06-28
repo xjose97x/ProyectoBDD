@@ -37,11 +37,9 @@ EXEC RecursosHumanos.Insertar_Empleado_SP '1200000000', 'Juan Carlos', 'Bodoque'
 EXEC RecursosHumanos.Insertar_Empleado_SP '1200000003', 'Miguel', 'Brito', 'miguelb@gmail.com', '+593 98123451', 'M', '2000-12-12', 'Av. 10 de Agosto E4-12', 800.00, 'Proyeccion'
 
 --Inserción de funciones
-EXEC Funciones.Crear_Funcion_SP '20220619 10:30:00 AM', 1, 1, 1, 2
---EXEC CrearFuncion_SP '20220622 10:30:00 AM', 1, 1, 1, 2 --TODO: Bug al insertar funciones a la misma hora en dias diferentes
+EXEC Funciones.Crear_Funcion_SP '20220620 10:30:00 AM', 1, 1, 1, 3
+EXEC Funciones.Crear_Funcion_SP '20220620 01:30:00 PM', 1, 1, 1, 3
 
-EXEC Funciones.Crear_Funcion_SP '20220619 01:30:00 PM', 1, 1, 1, 2
-
-EXEC Funciones.Crear_Funcion_SP '20220619 01:30:00 PM', 2, 2, 3, 4
-EXEC Funciones.Crear_Funcion_SP '20220619 03:30:00 PM', 2, 2, 3, 4
+EXEC Funciones.Crear_Funcion_SP '20220620 01:30:00 PM', 2, 2, 2, 4
+EXEC Funciones.Crear_Funcion_SP '20220620 03:30:00 PM', 2, 2, 2, 4
 GO
