@@ -1,13 +1,9 @@
 USE Flicks4U
 GO
 
-
 -- Stored Procedures para Sala
 CREATE PROCEDURE Funciones.Crear_Sala_SP
-    (@AFORO TINYINT,
-    @TIPO_SALA VARCHAR(4),
-	@TIPO_PROYECTOR CHAR(1),
-	@NewId TINYINT = NULL OUTPUT)
+(@AFORO TINYINT, @TIPO_SALA VARCHAR(4), @TIPO_PROYECTOR CHAR(1), @NEW_ID TINYINT = NULL OUTPUT)
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -17,7 +13,7 @@ BEGIN
 		ELSE
 			INSERT INTO Funciones.Sala(Aforo, TipoSala, TipoProyector)
 			VALUES(@AFORO, @TIPO_SALA, @TIPO_PROYECTOR)
-			SET @NewId = SCOPE_IDENTITY();
+			SET @NEW_ID = SCOPE_IDENTITY();
 	END TRY
 	BEGIN CATCH
 		PRINT N'Error durante la inserción a la tabla [Sala]'
@@ -31,11 +27,8 @@ BEGIN
 END
 GO
 
-CREATE PROC Funciones.Obtener_Estado_Sala_SP
-    (@ID_SALA INT,
-	 @FECHA_INICIO DATETIME,
-	 @FECHA_FIN DATETIME,
-	 @RESULTADO varchar(15) OUTPUT)
+CREATE PROCEDURE Funciones.Obtener_Estado_Sala_SP
+(@ID_SALA INT, @FECHA_INICIO DATETIME, @FECHA_FIN DATETIME, @RESULTADO VARCHAR(15) OUTPUT)
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -47,9 +40,9 @@ BEGIN
 			IF EXISTS (SELECT * FROM Funciones.Funcion
 						WHERE SalaId = @ID_SALA
 						AND @FECHA_INICIO >= FechaInicio AND @FECHA_FIN <= FechaFin)
-				SET @resultado = 'No disponible'
+				SET @RESULTADO = 'No disponible'
 			ELSE
-				SET @resultado = 'Disponible'
+				SET @RESULTADO = 'Disponible'
 	END TRY
 	BEGIN CATCH
 		PRINT N'Error al intentar obtener el estado de [Sala]'
@@ -66,8 +59,8 @@ GO
 
 -- Stored  Procedures para Pelicula
 CREATE PROCEDURE Funciones.Insertar_Pelicula_SP
-(@Nombre nvarchar(100), @Sinopsis Text, @Genero varchar(14), @Duracion time(0), @ImagenUrl varchar(100),
-@Formato varchar(10), @FechaEstreno Date, @FechaSalidaCartelera Date, @NewId INT = NULL OUTPUT)
+(@NOMBRE NVARCHAR(100), @SINOPSIS TEXT, @GENERO VARCHAR(14), @DURACION  TIME(0), @IMAGEN_URL VARCHAR(100),
+@FORMATO varchar(10), @FECHA_ESTRENO DATE, @FECHA_SALIDA_CARTELERA Date, @NEW_ID INT = NULL OUTPUT)
 AS
 	SET NOCOUNT ON
 	BEGIN TRY
@@ -77,8 +70,8 @@ AS
 			THROW 60000, 'La duración excede el tiempo permitido.', 1; 
 		ELSE
 			INSERT INTO Funciones.Pelicula (Nombre, Sinopsis, Genero, Duracion, ImagenUrl, Formato, FechaEstreno, FechaSalidaCartelera)
-			VALUES (@Nombre, @Sinopsis, @Genero, @Duracion, @ImagenUrl, @Formato, @FechaEstreno, @FechaSalidaCartelera)
-			SET @NewId = SCOPE_IDENTITY();
+			VALUES (@NOMBRE, @SINOPSIS, @GENERO, @DURACION, @IMAGEN_URL, @FORMATO, @FECHA_ESTRENO, @FECHA_SALIDA_CARTELERA)
+			SET @NEW_ID = SCOPE_IDENTITY();
 	END TRY
 	BEGIN CATCH
 		PRINT N'Error durante la inserción a la tabla [Pelicula]'
@@ -92,19 +85,14 @@ AS
 GO
 
 -- Stored Procedures para Empleado
-CREATE PROC RecursosHumanos.Insertar_HorarioLaboral_SP
-(
-	@IdEmpleado SMALLINT,
-	@NumeroDia TINYINT,
-	@HoraInicio TIME,
-	@HoraFin TIME
-)
+CREATE PROCEDURE RecursosHumanos.Insertar_HorarioLaboral_SP
+(@ID_EMPLEADO SMALLINT, @NUMERO_DIA TINYINT, @HORA_INICIO TIME, @HORA_FIN TIME)
 AS
 BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON
 		INSERT INTO RecursosHumanos.HorarioLaboral(EmpleadoId, NumeroDia, HoraInicio, HoraFin)
-		VALUES (@IdEmpleado, @NumeroDia, @HoraInicio, @HoraFin)
+		VALUES (@ID_EMPLEADO, @NUMERO_DIA, @HORA_INICIO, @HORA_FIN)
 	END TRY
 	BEGIN CATCH
 		PRINT N'Error durante la inserción a la tabla [HorarioLaboral]'
@@ -119,19 +107,9 @@ END
 GO
 
 CREATE PROCEDURE RecursosHumanos.Insertar_Empleado_SP
-(
-	@dni varchar(10),
-	@nombres NVARCHAR(30),
-	@apellidos NVARCHAR(30),
-	@correo email,
-	@telefono phoneNumber,
-	@genero gender,
-	@fechaNacimiento DATE,
-	@direccion NVARCHAR(100),
-	@salario SMALLMONEY,
-	@tipo VARCHAR(45),
-	@NewId SMALLINT = NULL OUTPUT
-)
+(@DNI VARCHAR(10), @NOMBRES NVARCHAR(30), @APELLIDOS NVARCHAR(30), @CORREO EMAIL, 
+ @TELEFONO phoneNumber, @GENERO gender, @FECHA_NACIMIENTO DATE, @DIRECCION NVARCHAR(100),
+ @SALARIO SMALLMONEY, @TIPO VARCHAR(45), @NEW_ID SMALLINT = NULL OUTPUT)
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -140,17 +118,18 @@ BEGIN
 		( Dni, Nombres, Apellidos, Correo, Telefono, Genero, FechaNacimiento,
 		  FechaIngreso, Direccion, Salario, Tipo)
 		VALUES
-		( @dni, @nombres, @apellidos, @correo, @telefono, @genero, @fechaNacimiento,
-			GETDATE(), @direccion, @salario, @tipo )
-		SET @NewId = SCOPE_IDENTITY();
+		( @DNI, @NOMBRES, @APELLIDOS, @CORREO, @TELEFONO, @GENERO, @FECHA_NACIMIENTO,
+			GETDATE(), @DIRECCION, @SALARIO, @TIPO )
+		SET @NEW_ID = SCOPE_IDENTITY();
 
-		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 1, NULL, NULL
-		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 2, '08:00:00', '16:00:00'
-		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 3, '08:00:00', '16:00:00'
-		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 4, '08:00:00', '16:00:00'
-		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 5, '08:00:00', '16:00:00'
-		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 6, '08:00:00', '16:00:00'
-		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NewId, 7, NULL, NULL
+		-- Insertar horario laboral por defecto
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NEW_ID, 1, NULL, NULL
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NEW_ID, 2, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NEW_ID, 3, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NEW_ID, 4, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NEW_ID, 5, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NEW_ID, 6, '08:00:00', '16:00:00'
+		EXEC  RecursosHumanos.Insertar_HorarioLaboral_SP @NEW_ID, 7, NULL, NULL
 
 	END TRY
 	BEGIN CATCH
@@ -165,11 +144,8 @@ BEGIN
 END
 GO
 
-CREATE PROC Funciones.Obtener_Estado_Empleado_SP
-    (@ID_EMPLEADO SMALLINT,
-	 @FECHA_INICIO DATETIME,
-	 @FECHA_FIN DATETIME,
-	 @RESULTADO varchar(15) OUTPUT)
+CREATE PROCEDURE Funciones.Obtener_Estado_Empleado_SP
+(@ID_EMPLEADO SMALLINT, @FECHA_INICIO DATETIME, @FECHA_FIN DATETIME, @RESULTADO VARCHAR(15) OUTPUT)
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -206,22 +182,20 @@ BEGIN
 END
 GO
 
-CREATE PROC RecursosHumanos.Despedir_Empleado_SP
-(
-	@IdEmpleado INT
-)
+CREATE PROCEDURE RecursosHumanos.Despedir_Empleado_SP
+(@ID_EMPLEADO INT)
 AS
 BEGIN
 	BEGIN TRY
 		SET NOCOUNT ON
-		IF NOT EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @IdEmpleado)
+		IF NOT EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @ID_EMPLEADO)
 			THROW 60000, 'El empleado no existe.', 1; 
-		ELSE IF EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @IdEmpleado AND FechaEgreso IS NULL)
+		ELSE IF EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @ID_EMPLEADO AND FechaEgreso IS NULL)
 			THROW 60000, 'El empleado ya fue despedido.', 1; 
 		ELSE
 			UPDATE RecursosHumanos.Empleado
 			SET FechaEgreso = GETDATE()
-			WHERE Id = @IdEmpleado
+			WHERE Id = @ID_EMPLEADO
 	END TRY
 	BEGIN CATCH
 		PRINT N'Error intentando despedir a un [Empleado]'
@@ -236,13 +210,9 @@ END
 GO
 
 -- Stored Procedures para Funcion
-CREATE PROC Funciones.Crear_Funcion_SP
-    (@FECHA_INICIO DATETIME,
-	@PELICULA_ID INT,
-	@SALA_ID TINYINT,
-	@EMPLEADO_LIMPIEZA_ID SMALLINT,
-	@EMPLEADO_PROYECTOR_ID SMALLINT,
-	@NewId INT = NULL OUTPUT)
+CREATE PROCEDURE Funciones.Crear_Funcion_SP
+(@FECHA_INICIO DATETIME, @PELICULA_ID INT, @SALA_ID TINYINT, @EMPLEADO_LIMPIEZA_ID SMALLINT,
+@EMPLEADO_PROYECTOR_ID SMALLINT, @NEW_ID INT = NULL OUTPUT)
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -278,7 +248,7 @@ BEGIN
 			ELSE
 				INSERT INTO Funciones.Funcion (FechaInicio, FechaFin, PeliculaId, SalaId, EmpleadoLimpiezaId, EmpleadoProyecionId)
 					VALUES (@FECHA_INICIO, @fechaFin, @PELICULA_ID, @SALA_ID, @EMPLEADO_LIMPIEZA_ID,@EMPLEADO_PROYECTOR_ID)
-				SET @NewId = SCOPE_IDENTITY();
+				SET @NEW_ID = SCOPE_IDENTITY();
 	END TRY
 	BEGIN CATCH
 		PRINT N'Error durante la inserción a la tabla [Funcion]'
