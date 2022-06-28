@@ -1,6 +1,30 @@
 USE Flicks4U
 GO
 
+-- Funciones
+CREATE FUNCTION Funciones.PeliculaExiste (@ID INT)
+RETURNS BIT
+WITH EXECUTE AS CALLER
+AS
+BEGIN
+	IF EXISTS(SELECT * FROM Funciones.Pelicula WHERE Id = @ID)
+		RETURN(1)
+	RETURN(0)
+END
+GO
+
+CREATE FUNCTION Funciones.SalaExiste (@ID INT)
+RETURNS BIT
+WITH EXECUTE AS CALLER
+AS
+BEGIN
+	IF EXISTS(SELECT * FROM Funciones.Sala WHERE Id = @ID)
+		RETURN(1)
+	RETURN(0)
+END
+GO
+
+
 -- Stored Procedures para Sala
 CREATE PROCEDURE Funciones.Crear_Sala_SP
 (@AFORO TINYINT, @TIPO_SALA VARCHAR(4), @TIPO_PROYECTOR CHAR(1), @NEW_ID TINYINT = NULL OUTPUT)
@@ -34,8 +58,8 @@ BEGIN
 	SET NOCOUNT ON
     BEGIN TRY
 		--VALIDAR SI EXISTE SALA--
-		IF NOT EXISTS(SELECT * FROM Funciones.Sala WHERE Id = @ID_SALA)
-			THROW 60000, 'La sala no existe.', 1; 
+		IF Funciones.SalaExiste(@ID_SALA) = 0
+			THROW 60000, 'La sala no existe', 1;
 		ELSE
 			IF EXISTS (SELECT * FROM Funciones.Funcion
 						WHERE SalaId = @ID_SALA
@@ -217,9 +241,9 @@ AS
 BEGIN
 	SET NOCOUNT ON
     BEGIN TRY
-		IF NOT EXISTS(SELECT * FROM Funciones.Pelicula WHERE Id = @PELICULA_ID)
-			THROW 60000, 'La pelicula no existe', 1; 
-		ELSE IF NOT EXISTS (SELECT * FROM Funciones.Sala WHERE Id = @SALA_ID)
+		IF Funciones.PeliculaExiste(@PELICULA_ID) = 0
+			THROW 60000, 'La pelicula no existe.', 1;
+		ELSE IF Funciones.SalaExiste(@SALA_ID) = 0
 			THROW 60000, 'La sala no existe', 1; 
 		ELSE IF NOT EXISTS(SELECT * FROM Funciones.EmpleadoParaGestor WHERE id = @EMPLEADO_LIMPIEZA_ID)
 			THROW 60000, 'El empleado de limpieza no existe', 1; 
