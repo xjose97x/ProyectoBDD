@@ -1,60 +1,97 @@
-IF EXISTS (
-    SELECT 1 FROM sys.configurations 
-    WHERE NAME = 'Database Mail XPs' AND VALUE = 0)
+USE Flicks4U
+GO
+
+-- Menu de funcionalidades relacionadas al esquema de funciones
+CREATE PROCEDURE menuFunciones_SP
+AS
 BEGIN
-  PRINT 'Enabling Database Mail XPs'
-  EXEC sp_configure 'show advanced options', 1;  
-  RECONFIGURE
-  EXEC sp_configure 'Database Mail XPs', 1;  
-  RECONFIGURE  
+	PRINT 'ESQUEMA FUNCIONES'
+	PRINT ''
+	PRINT '		Funciones.Crear_Funcion_SP @FechaInicio, @PeliculaId, @SalaId, @EmpleadoLimpiezaId, @EmpleadoProyectorId - Crea una nueva funcion'
+	PRINT ''
+	PRINT '		Funciones.Crear_Sala_SP @Aforo, @TipoSala, @TipoProyector - Crea una nueva sala'
+	PRINT ''
+	PRINT '		Funciones.Insertar_Pelicula_SP @Nombre, @Sinopsis, @Genero, @Duracion, @ImagenUrl, @Formato, @FechaEstreno, @FechaSalidaCartelera - Crea una nueva pelicula'
+	PRINT ''
+	PRINT '		Funciones.Obtener_Estado_Sala_SP @IdSala, @FechaInicio, @FechaFin - Retorna el estado de una sala entre un rango de fechas'
+	PRINT ''
+	PRINT '		Funciones.Obtener_Estado_Empleado_SP @IdEmpleado, @FechaInicio, @FechaFin - Retorna el estado de un empleado en un rango de fechas'
+	PRINT ''
 END
 GO
 
-IF NOT EXISTS (SELECT 1 FROM msdb.dbo.sysmail_account WHERE [name] = 'DBA Email Account')
-	EXECUTE msdb.dbo.sysmail_add_account_sp
-		@account_name = 'DBA Email Account',
-		@description = 'DB account for DBAs and SQL Agent',
-		@email_address = 'jose.escudero@udla.edu.ec',
-		@display_name = 'Flicks4U',
-		@mailserver_name = 'smtp.sendgrid.net',
-		@mailserver_type = 'SMTP',
-		@username = 'apikey',
-		@password = '<REEMPLAZAR CON SENDGRID API KEY>',
-		@port = 587,
-		@enable_ssl = 1;
-ELSE
-	PRINT 'sysmail_account already configured'
+-- Menu de funcionalidades relacionadas al esquema de recursos humanos
+CREATE PROCEDURE menuRecursosHumanos_SP
+AS
+BEGIN
+	PRINT 'ESQUEMA RECURSOS HUMANOS'
+	PRINT ''
+	PRINT '		RecursosHumanos.Insertar_HorarioLaboral_SP @IdEmpleado, @NumeroDia, @HoraInicio, @HoraFin - Inserta un horario laboral'
+	PRINT ''
+	PRINT '		RecursosHumanos.Insertar_Empleado_SP @dni, @nombres, @apellidos, @correo, @telefono, @genero, @fechaNacimiento, @direccion, @salario, @tipo - Inserta un nuevo empleado'
+	PRINT ''
+	PRINT '		RecursosHumanos.Despedir_Empleado_SP @IdEmpleado - Remueve un empleado existente'
+	PRINT ''
+END
+GO
+	
+-- Menu de reportes
+CREATE PROCEDURE menuReportes_SP
+AS
+BEGIN
+	PRINT 'REPORTES'
+	PRINT ''
+	PRINT '		FuncionesDia_SP @Fecha - Reporte de Funciones en un día especifico'
+	PRINT ''
+	PRINT '		HorarioEmpleado_SP @EmpleadoId, @Fecha - Reporte de horario de un empleado en una fecha especifica'
+	PRINT ''
+END
 GO
 
--- Create a database mail profile (Profile must be called AzureManagedInstance_dbmail_profile)
-IF NOT EXISTS (SELECT 1 FROM msdb..sysmail_profile WHERE name = 'DBA_Email_Profile')
+-- Procedimiento almacenado encargado de imprimir el menu
+CREATE PROCEDURE menu_SP
+AS
+BEGIN
+	IF (SUSER_NAME() = 'gestorFunciones')
 	BEGIN
-		EXECUTE msdb.dbo.sysmail_add_profile_sp
-		@profile_name = 'DBA_Email_Profile',
-		@description = 'Main profile for sending database mail';
-		-- Associate account with profile
-		EXECUTE msdb.dbo.sysmail_add_profileaccount_sp
-		@profile_name = 'DBA_Email_Profile',
-		@account_name = 'DBA Email Account',
-		@sequence_number = 1 ;
+		PRINT ''
+		PRINT '------ MENU GESTOR DE FUNCIONES ------'
+		PRINT ''
+		EXEC menuFunciones_SP
+		EXEC menuReportes_SP
 	END
-ELSE
-	PRINT 'DBMail profile already configured'
+	ELSE IF (SUSER_NAME() = 'recursosHumanos')
+	BEGIN
+		PRINT ''
+		PRINT '------ MENU RECURSOS HUMANOS ------'
+		PRINT ''
+		EXEC menuRecursosHumanos_SP
+		EXEC menuReportes_SP
+	END
+	ELSE IF (SUSER_NAME() = 'visualizadorReportes')
+	BEGIN
+		PRINT ''
+		PRINT '------ MENU VISUALIZADOR REPORTES ------'
+		PRINT ''
+		EXEC menuReportes_SP
+	END
+	ELSE
+	BEGIN
+		PRINT ''
+		PRINT '------ MENU ADMINISTRADOR ------'
+		PRINT ''
+		EXEC menuFunciones_SP
+		EXEC menuRecursosHumanos_SP
+		EXEC menuReportes_SP
+	END
+END
 GO
 
-CREATE TRIGGER NotificacionContratacion
-	ON RecursosHumanos.Empleado
-	FOR INSERT
-	AS
-	BEGIN
-		SET NOCOUNT ON;
-		DECLARE @email nvarchar(50)
-		SET @email = (SELECT INSERTED.Correo FROM INSERTED)
-		DECLARE @body NVARCHAR(80)
-		SET @body = CONCAT('Nuevo empleado contratado. Su correo es: ', @email)
-		EXEC msdb.dbo.sp_send_dbmail  @profile_name = 'DBA_Email_Profile',
-		  @recipients = 'joseignacioescudero@gmail.com', 
-		  @subject = 'Nuevo empleado contratado!', 
-		  @body = @body
-	END
-RETURN
+--DROP PROC menuFunciones_SP
+--DROP PROC menuReportes_SP
+--DROP PROC menuRecursosHumanos_SP
+--DROP PROC menu_SP
+
+--USE Flicks4U
+--GO
+--EXEC menu_SP

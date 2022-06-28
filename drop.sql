@@ -1,7 +1,7 @@
 USE master
 GO
 
-alter database Flicks4U set single_user with rollback immediate
+ALTER DATABASE Flicks4U SET SINGLE_USER WITH ROLLBACK IMMEDIATE
 
 DROP DATABASE Flicks4U
 DROP LOGIN administrador

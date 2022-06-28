@@ -1,97 +1,125 @@
-USE Flicks4U
+USE Flicks4u
+GO
+--------------------------------------------------------------------------------------
+-- Comentarios para cada columna de la tabla "Funciones.Funciï¿½n"
+--------------------------------------------------------------------------------------
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Clave primaria para la tabla la tabla "Funciï¿½n". Es autoincremental y es de tipo INT. ' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Funcion', @level2type=N'COLUMN',@level2name=N'Id'
 GO
 
--- Menu de funcionalidades relacionadas al esquema de funciones
-CREATE PROCEDURE menuFunciones_SP
-AS
-BEGIN
-	PRINT 'ESQUEMA FUNCIONES'
-	PRINT ''
-	PRINT '		Funciones.Crear_Funcion_SP @FechaInicio, @PeliculaId, @SalaId, @EmpleadoLimpiezaId, @EmpleadoProyectorId - Crea una nueva funcion'
-	PRINT ''
-	PRINT '		Funciones.Crear_Sala_SP @Aforo, @TipoSala, @TipoProyector - Crea una nueva sala'
-	PRINT ''
-	PRINT '		Funciones.Insertar_Pelicula_SP @Nombre, @Sinopsis, @Genero, @Duracion, @ImagenUrl, @Formato, @FechaEstreno, @FechaSalidaCartelera - Crea una nueva pelicula'
-	PRINT ''
-	PRINT '		Funciones.Obtener_Estado_Sala_SP @IdSala, @FechaInicio, @FechaFin - Retorna el estado de una sala entre un rango de fechas'
-	PRINT ''
-	PRINT '		Funciones.Obtener_Estado_Empleado_SP @IdEmpleado, @FechaInicio, @FechaFin - Retorna el estado de un empleado en un rango de fechas'
-	PRINT ''
-END
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena fecha y hora de inicio de una funciï¿½n, se agrega directamente desde el stored procedure de "CrearFuncion_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Funcion', @level2type=N'COLUMN',@level2name=N'FechaInicio'
 GO
 
--- Menu de funcionalidades relacionadas al esquema de recursos humanos
-CREATE PROCEDURE menuRecursosHumanos_SP
-AS
-BEGIN
-	PRINT 'ESQUEMA RECURSOS HUMANOS'
-	PRINT ''
-	PRINT '		RecursosHumanos.Insertar_HorarioLaboral_SP @IdEmpleado, @NumeroDia, @HoraInicio, @HoraFin - Inserta un horario laboral'
-	PRINT ''
-	PRINT '		RecursosHumanos.Insertar_Empleado_SP @dni, @nombres, @apellidos, @correo, @telefono, @genero, @fechaNacimiento, @direccion, @salario, @tipo - Inserta un nuevo empleado'
-	PRINT ''
-	PRINT '		RecursosHumanos.Despedir_Empleado_SP @IdEmpleado - Remueve un empleado existente'
-	PRINT ''
-END
-GO
-	
--- Menu de reportes
-CREATE PROCEDURE menuReportes_SP
-AS
-BEGIN
-	PRINT 'REPORTES'
-	PRINT ''
-	PRINT '		FuncionesDia_SP @Fecha - Reporte de Funciones en un día especifico'
-	PRINT ''
-	PRINT '		HorarioEmpleado_SP @EmpleadoId, @Fecha - Reporte de horario de un empleado en una fecha especifica'
-	PRINT ''
-END
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena fecha y hora de finalizaciï¿½n de una funciï¿½n. Se calcula en base a "FechaInicio" directamente desde "CrearFuncion_SP", donde a "FechaInicio" se suma la duraciï¿½n de la pelï¿½cula junto con 35 minutos que contemplan limpieza y anuncios. NO AGREGAR DIRECTAMENTE.' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Funcion', @level2type=N'COLUMN',@level2name=N'FechaFin'
 GO
 
--- Procedimiento almacenado encargado de imprimir el menu
-CREATE PROCEDURE menu_SP
-AS
-BEGIN
-	IF (SUSER_NAME() = 'gestorFunciones')
-	BEGIN
-		PRINT ''
-		PRINT '------ MENU GESTOR DE FUNCIONES ------'
-		PRINT ''
-		EXEC menuFunciones_SP
-		EXEC menuReportes_SP
-	END
-	ELSE IF (SUSER_NAME() = 'recursosHumanos')
-	BEGIN
-		PRINT ''
-		PRINT '------ MENU RECURSOS HUMANOS ------'
-		PRINT ''
-		EXEC menuRecursosHumanos_SP
-		EXEC menuReportes_SP
-	END
-	ELSE IF (SUSER_NAME() = 'visualizadorReportes')
-	BEGIN
-		PRINT ''
-		PRINT '------ MENU VISUALIZADOR REPORTES ------'
-		PRINT ''
-		EXEC menuReportes_SP
-	END
-	ELSE
-	BEGIN
-		PRINT ''
-		PRINT '------ MENU ADMINISTRADOR ------'
-		PRINT ''
-		EXEC menuFunciones_SP
-		EXEC menuRecursosHumanos_SP
-		EXEC menuReportes_SP
-	END
-END
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'ID que permite asignar un empleado de limpieza a una sala. Se lo asigna desde "CrearFuncion_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Funcion', @level2type=N'COLUMN',@level2name=N'EmpleadoLimpiezaId'
 GO
 
---DROP PROC menuFunciones_SP
---DROP PROC menuReportes_SP
---DROP PROC menuRecursosHumanos_SP
---DROP PROC menu_SP
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'ID que permite asignar un empleado de proyecciï¿½n a una sala. Se lo asigna desde "CrearFuncion_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Funcion', @level2type=N'COLUMN',@level2name=N'EmpleadoProyecionId'
+GO
 
---USE Flicks4U
---GO
---EXEC menu_SP
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Permite asignar una pelï¿½cula a una funciï¿½n. Se utiliza dentro de FK_Pelï¿½cula y se carga directamente desde "CrearFuncion_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Funcion', @level2type=N'COLUMN',@level2name=N'PeliculaId'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Permite asignar una sala a una funciï¿½n. Se utiliza dentro de FK_Sala y se carga directamente desde "CrearFuncion_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Funcion', @level2type=N'COLUMN',@level2name=N'SalaId'
+GO
+
+--------------------------------------------------------------------------------------
+-- Comentarios para cada columna de la tabla "Funciones.Pelï¿½cula"
+--------------------------------------------------------------------------------------
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Clave primaria para la tabla de "Pelï¿½cula". Es autoincremental y es de tipo INT.' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Pelicula', @level2type=N'COLUMN',@level2name=N'Id'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena el nombre de la pelï¿½cula, es de tipo nvarchar y puede tener una longitud de hasta 100 caracteres. Se carga directamente en "InsertarPelicula_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Pelicula', @level2type=N'COLUMN',@level2name=N'Nombre'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena la sinopsis de la pelï¿½cula. El tipo de dato utilizado es "Text" con el objetivo de almacenar cantidades grandes de texto. Se carga directamente en "InsertarPelicula_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Pelicula', @level2type=N'COLUMN',@level2name=N'Sinopsis'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena el gï¿½nero de la pelï¿½cula. Flicks4u tiene una serie de opciones limitadas que pueden ser agregadas en este campo, estas siendo "Aventura", "Terror",  "Comedia", "Drama", "Acciï¿½n", "Sci-fi". Se carga directamente en "InsertarPelicula_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Pelicula', @level2type=N'COLUMN',@level2name=N'Genero'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena la duraciï¿½n de la pelï¿½cula. Se agrega con el formato de "HH:MM:SS" y no puede exceder las 4 horas que es la duraciï¿½n mï¿½xima permitida por Flicks4u. Se carga directamente desde "InsertarPelicula_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Pelicula', @level2type=N'COLUMN',@level2name=N'Duracion'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena un link directo de internet donde se alojan los posters promocionales de cada pelï¿½cula. ï¿½nicamente se pueden cargar imagenes de formato jpg con formato "https://".  Se carga directamente desde "InsertarPelicula_SP"' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Pelicula', @level2type=N'COLUMN',@level2name=N'ImagenUrl'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Determina en quï¿½ tipo de proyector debe ser reproducida la pelï¿½cula. Flicks4u ï¿½nicamente admite pelï¿½culas en rollo de "35mm", "16mm", "digital", "IMAX" y "digital3D". Se carga directamente desde "InsertarPelicula_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Pelicula', @level2type=N'COLUMN',@level2name=N'Formato'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Es de tipo DATE y se carga directamente desde "InsertarPelicula_SP" con el formato "YYYY-MM-DD".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Pelicula', @level2type=N'COLUMN',@level2name=N'FechaEstreno'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Todas las pelï¿½culas que se estrenan en Flicks4u tienen un tiempo en cartelera de 2 meses con ciertas variaciones en cantidades de dï¿½as dependiendo del ï¿½xito del filme. Esto se debe cumplir en agregaciones a mano desde "InsertarPelicula_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Pelicula', @level2type=N'COLUMN',@level2name=N'FechaSalidaCartelera'
+GO
+--------------------------------------------------------------------------------------
+-- Comentarios para cada columna de la tabla "Funciones.Sala"
+--------------------------------------------------------------------------------------
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Clave primaria para la tabla de "Pelï¿½cula". Es autoincremental y es de tipo TINYINT.' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Sala', @level2type=N'COLUMN',@level2name=N'Id'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena cuï¿½ntas personas puede alojar una sala, es de tipo TINYINT lo que significa que toda sala puede tener un lï¿½mite de aforo de 255 personas. Se carga directamente desde "CrearSala_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Sala', @level2type=N'COLUMN',@level2name=N'Aforo'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena el tipo de sala disponible en Flicks4u y tiene valores estandarizados de acuerdo a las necesidades de la empresa, estos siendo "REG" (regular), "3D", "4D" y "VBOX". Se carga directamente desde "CrearSala_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Sala', @level2type=N'COLUMN',@level2name=N'TipoSala'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'En Flicks4u, ï¿½nicamente manejamos dos tipos de proyectores, estos siendo anï¿½logos ("A") y digitales ("D"), las especificaciones acerca del tipo de rollo que consumen las cï¿½maras anï¿½logas son dadas al empleado de proyecciï¿½n al momento de entrar a la sala. Se carga directamente desde "CrearSala_SP".' , @level0type=N'SCHEMA',@level0name=N'Funciones', @level1type=N'TABLE',@level1name=N'Sala', @level2type=N'COLUMN',@level2name=N'TipoProyector'
+GO
+--------------------------------------------------------------------------------------
+-- Agregar comentarios para cada columna de "RecursosHumanos.Empleado"
+--------------------------------------------------------------------------------------
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Clave primaria para la tabla de "Empleado". Es autoincremental y es de tipo SMALLINT.' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'Id'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena el identificacdor ï¿½nico de un empleado, este puede tener una longitud mï¿½xima de 10 caracteres y debe ser ï¿½nico.  Se carga directamente desde "InsertarEmpleado_SP".' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'DNI'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena los nombres de un empleado para su registro en el sistema. No se pueden agregar valores numï¿½ricos y tiene una longitud mï¿½xima de 30 caracteres (incluyendo especiales). Se agrega directamente desde "InsertarEmpleado_SP"..' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'Nombres'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena los apellidos de un empleado para su registro en el sistema. No se pueden agregar valores numï¿½ricos, tiene una longitud mï¿½xima de 30 caracteres (incluyendo especiales). Se agrega directamente desde "InsertarEmpleado_SP"..' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'Apellidos'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Hace uso de un tipo de dato customizado llamado "email" que requiere de inserciones de correo que cumplan con la inclusiï¿½n de un "@" y un "." y una longitud mï¿½xima de 50 caracteres (incluyendo especiales). Se carga direcamente desde Almacena los nombres de un empleado para su registro en el sistema. No se pueden agregar valores numï¿½ricos y tiene una longitud mï¿½xima de 30 caracteres. Se agrega directamente desde "InsertarEmpleado_SP".  ' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'Correo'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Hace uso de un tipo de dato customizado llamado "phoneNumber" que requiere de inserciones de nï¿½mero de telï¿½fono que cumplan con la inclusiï¿½n de un "+", un nï¿½mero de extensiï¿½n y el resto de dï¿½gitos de nï¿½mero celular.  Se agrega directamente desde "InsertarEmpleado_SP".  ' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'Telefono'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Hace uso de un tipo de dato customizado llamado "gender" que requiere de inserciones de un solo caracter "M" (masculino), "F" (femenino) u "O" (otro). ' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'Genero'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Es de tipo DATE y debe ser ingresado con el formato "YYYY-MM-DD", el sistema verifica que la fecha ingresada sea menor a la fecha actual y que la persona insertada sea mayor de edad (18 aï¿½os). Se ingresa directamente desde "InsertarEmpleado_SP".' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'FechaNacimiento'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Es de tipo DATE y debe ser ingresado con el formato "YYYY-MM-DD". Se agrega directamente desde "InsertarEmpleado_SP" y tiene un valor default de GETDATE().' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'FechaIngreso'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Permite ingresar la direcciï¿½n del empleado, se carga directamente desde "InsertarEmpleado_SP".' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'Direccion'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Campo nuleable, se define al momento de despedir al empleado o cuando este sale de la empresa por diferentes razones.' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'FechaEgreso'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'De tipo smallmoney, sirve para agregar los salarios de cada tipo de empleado. Los valores estandarizados son de $450 para empleado de limpieza y $700 dï¿½lares para empleados de proyecciï¿½n (al mes). Se agregan directamente desde "InsertarEmpleado_SP"' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'Salario'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Almacena si el empleado es de "Limpieza" o de "Proyecciï¿½n". Se agrega directamente desde "InsertarEmpleado_SP".' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'Empleado', @level2type=N'COLUMN',@level2name=N'Tipo'
+GO
+--------------------------------------------------------------------------------------
+-- Agregar comentarios para cada columna de "RecursosHumanos.HorarioLaboral"
+--------------------------------------------------------------------------------------
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Clave primaria para la tabla de "HorarioLaboral", se agrega conjuntamente con "NumeroDia" para determinar el cronograma de trabajo. Es autoincremental y es de tipo SMALLINT.' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'HorarioLaboral', @level2type=N'COLUMN',@level2name=N'EmpleadoId'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'Clave primaria para la tabla de "HorarioLaboral", se agrega conjuntamente con "EmpleadoId" para determinar a quï¿½ empleado se le asigna un cronograma de trabajo. Es autoincremental, de tipo TINYINT. y ï¿½nicamente permite realizar inserciones desde el 1 hasta el 7' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'HorarioLaboral', @level2type=N'COLUMN',@level2name=N'NumeroDia'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'De tipo TIME, sirve para agregar la hora en la que un empleado inicia su horario laboral. Permite valores NULL para fines de semana puesto que se consideran dï¿½as de trabajo extra con bonificaciones.' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'HorarioLaboral', @level2type=N'COLUMN',@level2name=N'HoraInicio'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'De tipo TIME, sirve para agregar la hora en la que un empleado termina su horario laboral.  Permite valores NULL para fines de semana puesto que se consideran dï¿½as de trabajo extra con bonificaciones.' , @level0type=N'SCHEMA',@level0name=N'RecursosHumanos', @level1type=N'TABLE',@level1name=N'HorarioLaboral', @level2type=N'COLUMN',@level2name=N'HoraFin'
+GO
+
