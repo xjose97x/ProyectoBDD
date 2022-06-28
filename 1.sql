@@ -427,6 +427,6 @@ DENY EXECUTE
 ON SCHEMA :: Reportes
 TO RRHH
 
-GRANT EXECUTE
+DENY EXECUTE
 ON SCHEMA :: Reportes
 TO gestorFunciones
