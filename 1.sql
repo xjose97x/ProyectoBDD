@@ -26,7 +26,7 @@ IF NOT EXISTS(SELECT name FROM sys.syslogins
 -- **** CREACIÓN DE BASE DE DATOS ****
 IF(DB_ID('Flicks4U') IS NOT NULL)
 BEGIN
-	alter database Flicks4U set single_user with rollback immediate
+	ALTER DATABASE Flicks4U SET SINGLE_USER WITH ROLLBACK IMMEDIATE
 	DROP DATABASE Flicks4U
 END
 GO
@@ -201,7 +201,7 @@ CREATE TABLE Funciones.Funcion
 GO
 
 -- Creación de Sinónimo EmpleadoParaGestor para esquema de funciones.
-IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'EmpleadoParaGestor')
+IF EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'EmpleadoParaGestor')
 	DROP SYNONYM EmpleadoParaGestor
 CREATE SYNONYM EmpleadoParaGestor FOR RecursosHumanos.Empleado
 GO
@@ -210,7 +210,7 @@ ALTER SCHEMA Funciones TRANSFER OBJECT :: EmpleadoParaGestor
 GO
 
 -- Creación de Sinónimo HorarioEmpleadoParaGestor para esquema de funciones.
-IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'HorarioEmpleadoParaGestor')
+IF EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'HorarioEmpleadoParaGestor')
 	DROP SYNONYM HorarioEmpleadoParaGestor
 CREATE SYNONYM HorarioEmpleadoParaGestor FOR RecursosHumanos.HorarioLaboral
 GO
@@ -219,7 +219,7 @@ ALTER SCHEMA Funciones TRANSFER OBJECT :: HorarioEmpleadoParaGestor
 GO
 
 -- Creación de Sinónimo PeliculaParaReportes para esquema de reportes.
-IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'PeliculaParaReportes')
+IF EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'PeliculaParaReportes')
 	DROP SYNONYM PeliculaParaReportes
 CREATE SYNONYM PeliculaParaReportes FOR Funciones.Pelicula
 GO
@@ -228,7 +228,7 @@ ALTER SCHEMA Reportes TRANSFER OBJECT :: PeliculaParaReportes
 GO
 
 -- Creación de Sinónimo FuncionesParaReportes para esquema de reportes.
-IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'FuncionesParaReportes')
+IF EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'FuncionesParaReportes')
 	DROP SYNONYM FuncionesParaReportes
 CREATE SYNONYM FuncionesParaReportes FOR Funciones.Funcion
 GO
@@ -237,7 +237,7 @@ ALTER SCHEMA Reportes TRANSFER OBJECT :: FuncionesParaReportes
 GO
 
 -- Creación de Sinónimo EmpleadoParaReportes para esquema de reportes.
-IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'EmpleadoParaReportes')
+IF EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'EmpleadoParaReportes')
 	DROP SYNONYM EmpleadoParaReportes
 CREATE SYNONYM EmpleadoParaReportes FOR RecursosHumanos.Empleado
 GO
@@ -246,7 +246,7 @@ ALTER SCHEMA Reportes TRANSFER OBJECT :: EmpleadoParaReportes
 GO
 
 -- Creación de Sinónimo SalasParaReportes para esquema de reportes.
-IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'SalasParaReportes')
+IF EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'SalasParaReportes')
 	DROP SYNONYM SalasParaReportes
 CREATE SYNONYM SalasParaReportes FOR Funciones.Sala
 GO
