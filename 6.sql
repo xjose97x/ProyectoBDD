@@ -2,6 +2,10 @@ USE Flicks4U
 GO
 
 -- Menu de funcionalidades relacionadas al esquema de funciones
+IF (OBJECT_ID('menuFunciones_SP') IS NOT NULL)
+  DROP PROCEDURE menuFunciones_SP
+GO
+
 CREATE PROCEDURE menuFunciones_SP
 AS
 BEGIN
@@ -21,6 +25,10 @@ END
 GO
 
 -- Menu de funcionalidades relacionadas al esquema de recursos humanos
+IF (OBJECT_ID('menuRecursosHumanos_SP') IS NOT NULL)
+  DROP PROCEDURE menuRecursosHumanos_SP
+GO
+
 CREATE PROCEDURE menuRecursosHumanos_SP
 AS
 BEGIN
@@ -36,6 +44,10 @@ END
 GO
 	
 -- Menu de reportes
+IF (OBJECT_ID('menuReportes_SP') IS NOT NULL)
+  DROP PROCEDURE menuReportes_SP
+GO
+
 CREATE PROCEDURE menuReportes_SP
 AS
 BEGIN
@@ -50,6 +62,10 @@ END
 GO
 
 -- Procedimiento almacenado encargado de imprimir el menu
+IF (OBJECT_ID('menu_SP') IS NOT NULL)
+  DROP PROCEDURE menu_SP
+GO
+
 CREATE PROCEDURE menu_SP
 AS
 BEGIN
