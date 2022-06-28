@@ -26,6 +26,7 @@ IF NOT EXISTS(SELECT name FROM sys.syslogins
 -- **** CREACIÓN DE BASE DE DATOS ****
 IF(DB_ID('Flicks4U') IS NOT NULL)
 BEGIN
+	alter database Flicks4U set single_user with rollback immediate
 	DROP DATABASE Flicks4U
 END
 GO
@@ -69,7 +70,8 @@ GO
 --Creación de tipo de dato gender
 IF (TYPE_ID('gender') IS NOT NULL)
     DROP TYPE phoneNumber
-GOIF (TYPE_ID('gender') IS NOT NULL)
+GO
+IF (TYPE_ID('gender') IS NOT NULL)
     DROP TYPE phoneNumber
 GO
 
@@ -250,25 +252,27 @@ GO
 EXEC sp_addrolemember N'db_owner', N'administrador'
 GO
 
--- Asignación de permiso a gestor de funciones de cine.
+-- Asignación de permisos a gestor de funciones de cine.
 GRANT SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: Funciones
 TO gestorFunciones
 GO
 
+-- Asignación de permisos a RRHH
 DENY SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: Funciones
 TO RRHH
 CASCADE
 GO
 
--- Asignación de permisos a sinónimo para gestor de funciones.
+-- Asignación de permisos a sinónimo EmpleadoParaGestor
 GRANT SELECT ON Funciones.EmpleadoParaGestor TO gestorFunciones
 GO
 
 DENY SELECT ON Funciones.EmpleadoParaGestor TO RRHH
 GO
 
+-- Asignación de permisos a sinónimo HorarioEmpleadoParaGestor
 GRANT SELECT ON Funciones.HorarioEmpleadoParaGestor TO gestorFunciones
 GO
 
@@ -285,3 +289,8 @@ DENY SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: RecursosHumanos
 TO gestorFunciones
 GO
+
+-- Asignación de permisos para ejecutar stored procedures
+GRANT EXECUTE TO gestorFunciones
+GRANT EXECUTE TO RRHH
+GRANT EXECUTE TO visualizadorReportes
