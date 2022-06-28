@@ -200,7 +200,7 @@ CREATE TABLE Funciones.Funcion
 )
 GO
 
--- Creación de Sinónimo EmpleadoParaGestor
+-- Creación de Sinónimo EmpleadoParaGestor para esquema de funciones.
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'EmpleadoParaGestor')
 	DROP SYNONYM EmpleadoParaGestor
 CREATE SYNONYM EmpleadoParaGestor FOR RecursosHumanos.Empleado
@@ -209,7 +209,7 @@ GO
 ALTER SCHEMA Funciones TRANSFER OBJECT :: EmpleadoParaGestor
 GO
 
--- Creación de Sinónimo HorarioEmpleadoParaGestor
+-- Creación de Sinónimo HorarioEmpleadoParaGestor para esquema de funciones.
 IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'HorarioEmpleadoParaGestor')
 	DROP SYNONYM HorarioEmpleadoParaGestor
 CREATE SYNONYM HorarioEmpleadoParaGestor FOR RecursosHumanos.HorarioLaboral
@@ -217,6 +217,43 @@ GO
 
 ALTER SCHEMA Funciones TRANSFER OBJECT :: HorarioEmpleadoParaGestor
 GO
+
+-- Creación de Sinónimo PeliculaParaReportes para esquema de reportes.
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'PeliculaParaReportes')
+	DROP SYNONYM PeliculaParaReportes
+CREATE SYNONYM PeliculaParaReportes FOR Funciones.Pelicula
+GO
+
+ALTER SCHEMA Reportes TRANSFER OBJECT :: PeliculaParaReportes
+GO
+
+-- Creación de Sinónimo FuncionesParaReportes para esquema de reportes.
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'FuncionesParaReportes')
+	DROP SYNONYM FuncionesParaReportes
+CREATE SYNONYM FuncionesParaReportes FOR Funciones.Funcion
+GO
+
+ALTER SCHEMA Reportes TRANSFER OBJECT :: FuncionesParaReportes
+GO
+
+-- Creación de Sinónimo EmpleadoParaReportes para esquema de reportes.
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'EmpleadoParaReportes')
+	DROP SYNONYM EmpleadoParaReportes
+CREATE SYNONYM EmpleadoParaReportes FOR RecursosHumanos.Empleado
+GO
+
+ALTER SCHEMA Reportes TRANSFER OBJECT :: EmpleadoParaReportes
+GO
+
+-- Creación de Sinónimo SalasParaReportes para esquema de reportes.
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'SalasParaReportes')
+	DROP SYNONYM SalasParaReportes
+CREATE SYNONYM SalasParaReportes FOR Funciones.Sala
+GO
+
+ALTER SCHEMA Reportes TRANSFER OBJECT :: SalasParaReportes
+GO
+
 
 -- **** CREACIÓN DE USUARIOS ****
 -- Creación de usuario administrador
@@ -288,12 +325,10 @@ TO gestorFunciones
 GRANT SELECT ON Funciones.HorarioEmpleadoParaGestor TO gestorFunciones
 GO
 
-
 DENY SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: Reportes
 TO RRHH
 GO
-
 
 -- Asignación de permisos a gestor de recursos humanos.
 GRANT SELECT, INSERT, DELETE, UPDATE
@@ -308,29 +343,90 @@ GO
 
 DENY SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: RecursosHumanos
-TO RRHH
+TO visualizadorReportes
 GO
 
--- Asignación de permisos a sinónimo para gestor de funciones.
+-- Asignación de permisos a sinónimos para gestor de funciones.
 GRANT SELECT ON Funciones.EmpleadoParaGestor TO gestorFunciones
+GO
+
+DENY INSERT, DELETE, UPDATE ON Funciones.EmpleadoParaGestor TO gestorFunciones
 GO
 
 GRANT SELECT ON Funciones.HorarioEmpleadoParaGestor TO gestorFunciones
 GO
 
-DENY SELECT ON Funciones.EmpleadoParaGestor TO RRHH
+DENY INSERT, DELETE, UPDATE ON Funciones.HorarioEmpleadoParaGestor TO gestorFunciones
 GO
 
-DENY SELECT ON Funciones.EmpleadoParaGestor to visualizadorReportes
+-- Asignación de permisos a sinónimos para visualizador de reportes.
+GRANT SELECT ON Reportes.EmpleadoParaReportes TO visualizadorReportes
 GO
 
-DENY SELECT ON Funciones.HorarioEmpleadoParaGestor to visualizadorReportes
+DENY INSERT, DELETE, UPDATE ON Reportes.EmpleadoParaReportes TO visualizadorReportes
 GO
 
-DENY SELECT ON Funciones.HorarioEmpleadoParaGestor TO RRHH
+GRANT SELECT ON Reportes.FuncionesParaReportes TO visualizadorReportes
 GO
 
--- Asignación de permisos para ejecutar stored procedures
-GRANT EXECUTE TO gestorFunciones
-GRANT EXECUTE TO RRHH
-GRANT EXECUTE TO visualizadorReportes
+DENY INSERT, DELETE, UPDATE ON Reportes.FuncionesParaReportes TO visualizadorReportes
+GO
+
+GRANT SELECT ON Reportes.PeliculaParaReportes TO visualizadorReportes
+GO
+
+DENY INSERT, DELETE, UPDATE ON Reportes.PeliculaParaReportes TO visualizadorReportes
+GO
+
+GRANT SELECT ON Reportes.SalasParaReportes TO visualizadorReportes
+GO
+
+DENY INSERT, DELETE, UPDATE ON Reportes.SalasParaReportes TO visualizadorReportes
+GO
+
+-- Asignación de permisos para ejecutar stored procedures a gestor sobre su esquema, 
+-- configuración para evitar que otros usuarios ejecuten SPs que no sean de su esquema.
+GRANT EXECUTE 
+ON SCHEMA :: Funciones
+TO gestorFunciones
+GO
+
+DENY EXECUTE
+ON SCHEMA :: RecursosHumanos
+TO RRHH
+GO
+
+DENY EXECUTE
+ON SCHEMA :: RecursosHumanos
+TO visualizadorReportes
+GO
+
+-- Asignación de permisos para ejecutar stored procedures a recursos humanos sobre su esquema, 
+-- configuración para evitar que otros usuarios ejecuten SPs que no sean de su esquema.
+GRANT EXECUTE
+ON SCHEMA :: RecursosHumanos
+TO RRHH
+GO
+
+DENY EXECUTE
+ON SCHEMA :: RecursosHumanos
+TO gestorFunciones
+GO
+
+DENY EXECUTE
+ON SCHEMA :: RecursosHumanos
+TO visualizadorReportes
+
+-- Asignación de permisos para ejecutar stored procedures a recursos humanos sobre su esquema, 
+-- configuración para evitar que otros usuarios ejecuten SPs que no sean de su esquema.
+GRANT EXECUTE
+ON SCHEMA :: Reportes
+TO visualizadorReportes
+
+DENY EXECUTE
+ON SCHEMA :: Reportes
+TO RRHH
+
+GRANT EXECUTE
+ON SCHEMA :: Reportes
+TO gestorFunciones

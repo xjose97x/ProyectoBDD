@@ -1,3 +1,6 @@
+USE Flicks4u
+GO
+
 CREATE PROC Funciones.Obtener_Estado_Sala_SP
     (@ID_SALA INT,
 	 @FECHA_INICIO DATETIME,
@@ -61,63 +64,6 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		PRINT N'Error al intentar obtener el estado de [Empleado]'
-		PRINT ERROR_MESSAGE()
-		PRINT N'Número de error: '+ CAST(ERROR_NUMBER() AS varchar(10))
-		PRINT N'Estado: ' + CAST(ERROR_SEVERITY() AS varchar(20))
-		PRINT N'Severidad: ' + CAST(ERROR_SEVERITY() AS varchar(10))
-		PRINT N'Línea de error: ' + CAST(ERROR_LINE() AS varchar(10));
-		THROW;
-	END CATCH
-END
-GO
-
-
-CREATE PROC Funciones.Crear_Funcion_SP
-    (@FECHA_INICIO DATETIME,
-	@PELICULA_ID INT,
-	@SALA_ID TINYINT,
-	@EMPLEADO_LIMPIEZA_ID SMALLINT,
-	@EMPLEADO_PROYECTOR_ID SMALLINT,
-	@NewId INT = NULL OUTPUT)
-AS
-BEGIN
-	SET NOCOUNT ON
-    BEGIN TRY
-		IF NOT EXISTS(SELECT * FROM Funciones.Pelicula WHERE Id = @PELICULA_ID)
-			THROW 60000, 'La pelicula no existe', 1; 
-		ELSE IF NOT EXISTS (SELECT * FROM Funciones.Sala WHERE Id = @SALA_ID)
-			THROW 60000, 'La sala no existe', 1; 
-		ELSE IF NOT EXISTS(SELECT * FROM Funciones.EmpleadoParaGestor WHERE id = @EMPLEADO_LIMPIEZA_ID)
-			THROW 60000, 'El empleado de limpieza no existe', 1; 
-		ELSE IF NOT EXISTS(SELECT * FROM Funciones.EmpleadoParaGestor WHERE id = @EMPLEADO_PROYECTOR_ID)
-			THROW 60000, 'El empleado de proyeccion no existe', 1; 
-		ELSE
-			DECLARE @fechaFin DATETIME
-			SET @fechaFin = @FECHA_INICIO +
-							CAST((SELECT Duracion FROM Funciones.Pelicula WHERE Id = @PELICULA_ID) as datetime) +
-							CAST('00:35:00' as datetime)
-			DECLARE @estadoSala VARCHAR(15)
-			EXEC Funciones.Obtener_Estado_Sala_SP @SALA_ID, @FECHA_INICIO, @fechaFin, @estadoSala OUTPUT
-
-			DECLARE @estadoEmpleadoLimpieza VARCHAR(15)
-			EXEC Funciones.Obtener_Estado_Empleado_SP @EMPLEADO_LIMPIEZA_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoLimpieza OUTPUT
-
-			DECLARE @estadoEmpleadoProyeccion VARCHAR(15)
-			EXEC Funciones.Obtener_Estado_Empleado_SP @EMPLEADO_PROYECTOR_ID, @FECHA_INICIO, @fechaFin, @estadoEmpleadoProyeccion OUTPUT
-
-			IF @estadoSala = 'No disponible'
-				THROW 60000, 'La sala no se encuentra disponible.', 1; 
-			ELSE IF @estadoEmpleadoLimpieza = 'No disponible'
-				THROW 60000, 'El empleado de limpieza no se encuentra disponible.', 1; 
-			ELSE IF @estadoEmpleadoProyeccion = 'No disponible'
-				THROW 60000, 'El empleado de proyeccion no se encuentra disponible.', 1; 
-			ELSE
-				INSERT INTO Funciones.Funcion (FechaInicio, FechaFin, PeliculaId, SalaId, EmpleadoLimpiezaId, EmpleadoProyecionId)
-					VALUES (@FECHA_INICIO, @fechaFin, @PELICULA_ID, @SALA_ID, @EMPLEADO_LIMPIEZA_ID,@EMPLEADO_PROYECTOR_ID)
-				SET @NewId = SCOPE_IDENTITY();
-	END TRY
-	BEGIN CATCH
-		PRINT N'Error durante la inserción a la tabla [Funcion]'
 		PRINT ERROR_MESSAGE()
 		PRINT N'Número de error: '+ CAST(ERROR_NUMBER() AS varchar(10))
 		PRINT N'Estado: ' + CAST(ERROR_SEVERITY() AS varchar(20))
