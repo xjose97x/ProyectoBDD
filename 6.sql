@@ -8,10 +8,10 @@ BEGIN
   EXEC sp_configure 'Database Mail XPs', 1;  
   RECONFIGURE  
 END
+GO
 
 IF NOT EXISTS (SELECT 1 FROM msdb.dbo.sysmail_account WHERE [name] = 'DBA Email Account')
-	BEGIN
-		EXECUTE msdb.dbo.sysmail_add_account_sp
+	EXECUTE msdb.dbo.sysmail_add_account_sp
 		@account_name = 'DBA Email Account',
 		@description = 'DB account for DBAs and SQL Agent',
 		@email_address = 'jose.escudero@udla.edu.ec',
@@ -22,9 +22,9 @@ IF NOT EXISTS (SELECT 1 FROM msdb.dbo.sysmail_account WHERE [name] = 'DBA Email 
 		@password = '<REEMPLAZAR CON SENDGRID API KEY>',
 		@port = 587,
 		@enable_ssl = 1;
-	END
 ELSE
 	PRINT 'sysmail_account already configured'
+GO
 
 -- Create a database mail profile (Profile must be called AzureManagedInstance_dbmail_profile)
 IF NOT EXISTS (SELECT 1 FROM msdb..sysmail_profile WHERE name = 'DBA_Email_Profile')
@@ -40,7 +40,7 @@ IF NOT EXISTS (SELECT 1 FROM msdb..sysmail_profile WHERE name = 'DBA_Email_Profi
 	END
 ELSE
 	PRINT 'DBMail profile already configured'
-
+GO
 
 CREATE TRIGGER NotificacionContratacion
 	ON RecursosHumanos.Empleado
