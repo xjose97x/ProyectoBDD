@@ -40,6 +40,8 @@ BEGIN
 	PRINT ''
 	PRINT '		RecursosHumanos.Despedir_Empleado_SP @IdEmpleado - Remueve un empleado existente'
 	PRINT ''
+	PRINT '		RecursosHumanos.Modificar_Horario_Empleado @IdEmpleado, @NumeroDia, @HoraInicio, @HoraFin - Actualiza el horario laboral de un empleado'
+	PRINT ''
 END
 GO
 	
