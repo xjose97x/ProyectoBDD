@@ -15,7 +15,7 @@ BEGIN
 	JOIN Reportes.PeliculaParaReportes AS FP ON FP.Id = FF.PeliculaId
 	JOIN Reportes.EmpleadoParaReportes AS EL ON EL.Id = FF.EmpleadoLimpiezaId
 	JOIN Reportes.EmpleadoParaReportes AS EP ON EP.Id = FF.EmpleadoProyecionId
-	WHERE CAST(FF.FechaInicio AS DATE) = '2022-06-19'
+	WHERE CAST(FF.FechaInicio AS DATE) = @Fecha
 END
 GO
 --EXEC Reportes.Funciones_Dia_SP '2022-06-19'
