@@ -2,6 +2,12 @@ USE Flicks4U
 GO
 
 -- Funciones
+IF EXISTS (SELECT * FROM sys.objects
+           WHERE object_id = OBJECT_ID(N'[Funciones].[PeliculaExiste]')
+                  AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))
+	DROP FUNCTION Funciones.PeliculaExiste
+GO
+
 CREATE FUNCTION Funciones.PeliculaExiste (@ID INT)
 RETURNS BIT
 WITH EXECUTE AS CALLER
@@ -11,6 +17,12 @@ BEGIN
 		RETURN(1)
 	RETURN(0)
 END
+GO
+
+IF EXISTS (SELECT * FROM sys.objects
+           WHERE object_id = OBJECT_ID(N'[Funciones].[SalaExiste]')
+                  AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' ))
+	DROP FUNCTION Funciones.SalaExiste
 GO
 
 CREATE FUNCTION Funciones.SalaExiste (@ID INT)
@@ -26,6 +38,10 @@ GO
 
 
 -- Stored Procedures para Sala
+IF (OBJECT_ID('Funciones.Crear_Sala_SP') IS NOT NULL)
+  DROP PROCEDURE Funciones.Crear_Sala_SP
+GO
+
 CREATE PROCEDURE Funciones.Crear_Sala_SP
 (@AFORO TINYINT, @TIPO_SALA VARCHAR(4), @TIPO_PROYECTOR CHAR(1), @NEW_ID TINYINT = NULL OUTPUT)
 AS
@@ -49,6 +65,10 @@ BEGIN
 		THROW;
 	END CATCH
 END
+GO
+
+IF (OBJECT_ID('Funciones.Obtener_Estado_Sala_SP') IS NOT NULL)
+  DROP PROCEDURE Funciones.Obtener_Estado_Sala_SP
 GO
 
 CREATE PROCEDURE Funciones.Obtener_Estado_Sala_SP
@@ -82,6 +102,11 @@ GO
 
 
 -- Stored  Procedures para Pelicula
+IF (OBJECT_ID('Funciones.Insertar_Pelicula_SP') IS NOT NULL)
+  DROP PROCEDURE Funciones.Insertar_Pelicula_SP
+GO
+
+
 CREATE PROCEDURE Funciones.Insertar_Pelicula_SP
 (@NOMBRE NVARCHAR(100), @SINOPSIS TEXT, @GENERO VARCHAR(14), @DURACION  TIME(0), @IMAGEN_URL VARCHAR(100),
 @FORMATO varchar(10), @FECHA_ESTRENO DATE, @FECHA_SALIDA_CARTELERA Date, @NEW_ID INT = NULL OUTPUT)
@@ -109,6 +134,10 @@ AS
 GO
 
 -- Stored Procedures para Empleado
+IF (OBJECT_ID('RecursosHumanos.Insertar_HorarioLaboral_SP') IS NOT NULL)
+  DROP PROCEDURE RecursosHumanos.Insertar_HorarioLaboral_SP
+GO
+
 CREATE PROCEDURE RecursosHumanos.Insertar_HorarioLaboral_SP
 (@ID_EMPLEADO SMALLINT, @NUMERO_DIA TINYINT, @HORA_INICIO TIME, @HORA_FIN TIME)
 AS
@@ -128,6 +157,10 @@ BEGIN
 		THROW;
 	END CATCH
 END
+GO
+
+IF (OBJECT_ID('RecursosHumanos.Insertar_Empleado_SP') IS NOT NULL)
+  DROP PROCEDURE RecursosHumanos.Insertar_Empleado_SP
 GO
 
 CREATE PROCEDURE RecursosHumanos.Insertar_Empleado_SP
@@ -168,6 +201,10 @@ BEGIN
 END
 GO
 
+IF (OBJECT_ID('Funciones.Obtener_Estado_Empleado_SP') IS NOT NULL)
+  DROP PROCEDURE Funciones.Obtener_Estado_Empleado_SP
+GO
+
 CREATE PROCEDURE Funciones.Obtener_Estado_Empleado_SP
 (@ID_EMPLEADO SMALLINT, @FECHA_INICIO DATETIME, @FECHA_FIN DATETIME, @RESULTADO VARCHAR(15) OUTPUT)
 AS
@@ -206,6 +243,10 @@ BEGIN
 END
 GO
 
+IF (OBJECT_ID('RecursosHumanos.Despedir_Empleado_SP') IS NOT NULL)
+  DROP PROCEDURE RecursosHumanos.Despedir_Empleado_SP
+GO
+
 CREATE PROCEDURE RecursosHumanos.Despedir_Empleado_SP
 (@ID_EMPLEADO INT)
 AS
@@ -234,6 +275,10 @@ END
 GO
 
 -- Stored Procedures para Funcion
+IF (OBJECT_ID('Funciones.Crear_Funcion_SP') IS NOT NULL)
+  DROP PROCEDURE Funciones.Crear_Funcion_SP
+GO
+
 CREATE PROCEDURE Funciones.Crear_Funcion_SP
 (@FECHA_INICIO DATETIME, @PELICULA_ID INT, @SALA_ID TINYINT, @EMPLEADO_LIMPIEZA_ID SMALLINT,
 @EMPLEADO_PROYECTOR_ID SMALLINT, @NEW_ID INT = NULL OUTPUT)
