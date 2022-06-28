@@ -92,6 +92,32 @@ AS
 GO
 
 -- Stored Procedures para Empleado
+CREATE PROC RecursosHumanos.Insertar_HorarioLaboral_SP
+(
+	@IdEmpleado SMALLINT,
+	@NumeroDia TINYINT,
+	@HoraInicio TIME,
+	@HoraFin TIME
+)
+AS
+BEGIN
+	BEGIN TRY
+		SET NOCOUNT ON
+		INSERT INTO RecursosHumanos.HorarioLaboral(EmpleadoId, NumeroDia, HoraInicio, HoraFin)
+		VALUES (@IdEmpleado, @NumeroDia, @HoraInicio, @HoraFin)
+	END TRY
+	BEGIN CATCH
+		PRINT N'Error durante la inserción a la tabla [HorarioLaboral]'
+		PRINT ERROR_MESSAGE()
+		PRINT N'Número de error: '+ CAST(ERROR_NUMBER() AS varchar(10))
+		PRINT N'Estado: ' + CAST(ERROR_SEVERITY() AS varchar(20))
+		PRINT N'Severidad: ' + CAST(ERROR_SEVERITY() AS varchar(10))
+		PRINT N'Línea de error: ' + CAST(ERROR_LINE() AS varchar(10));
+		THROW;
+	END CATCH
+END
+GO
+
 CREATE PROCEDURE RecursosHumanos.Insertar_Empleado_SP
 (
 	@dni varchar(10),
@@ -129,32 +155,6 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		PRINT N'Error durante la inserción a la tabla [Empleado]'
-		PRINT ERROR_MESSAGE()
-		PRINT N'Número de error: '+ CAST(ERROR_NUMBER() AS varchar(10))
-		PRINT N'Estado: ' + CAST(ERROR_SEVERITY() AS varchar(20))
-		PRINT N'Severidad: ' + CAST(ERROR_SEVERITY() AS varchar(10))
-		PRINT N'Línea de error: ' + CAST(ERROR_LINE() AS varchar(10));
-		THROW;
-	END CATCH
-END
-GO
-
-CREATE PROC RecursosHumanos.Insertar_HorarioLaboral_SP
-(
-	@IdEmpleado SMALLINT,
-	@NumeroDia TINYINT,
-	@HoraInicio TIME,
-	@HoraFin TIME
-)
-AS
-BEGIN
-	BEGIN TRY
-		SET NOCOUNT ON
-		INSERT INTO RecursosHumanos.HorarioLaboral(EmpleadoId, NumeroDia, HoraInicio, HoraFin)
-		VALUES (@IdEmpleado, @NumeroDia, @HoraInicio, @HoraFin)
-	END TRY
-	BEGIN CATCH
-		PRINT N'Error durante la inserción a la tabla [HorarioLaboral]'
 		PRINT ERROR_MESSAGE()
 		PRINT N'Número de error: '+ CAST(ERROR_NUMBER() AS varchar(10))
 		PRINT N'Estado: ' + CAST(ERROR_SEVERITY() AS varchar(20))
