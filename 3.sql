@@ -40,6 +40,7 @@ EXEC RecursosHumanos.Insertar_Empleado_SP '1200000003', 'Miguel', 'Brito', 'migu
 EXEC Funciones.Crear_Funcion_SP '20220620 10:30:00 AM', 1, 1, 1, 3
 EXEC Funciones.Crear_Funcion_SP '20220620 01:30:00 PM', 1, 1, 1, 3
 
-EXEC Funciones.Crear_Funcion_SP '20220620 01:30:00 PM', 2, 2, 2, 4
-EXEC Funciones.Crear_Funcion_SP '20220620 03:30:00 PM', 2, 2, 2, 4
+EXEC Funciones.Crear_Funcion_SP '20220620 08:00:00 AM', 2, 2, 2, 4
+EXEC Funciones.Crear_Funcion_SP '20220620 11:30:00 AM', 2, 2, 2, 4
+
 GO

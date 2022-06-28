@@ -41,10 +41,11 @@ AS
 BEGIN
 	PRINT 'REPORTES'
 	PRINT ''
-	PRINT '		FuncionesDia_SP @Fecha - Reporte de Funciones en un día especifico'
+	PRINT '		FuncionesDia_SP @Fecha - Reporte de Funciones en un dï¿½a especifico'
 	PRINT ''
 	PRINT '		HorarioEmpleado_SP @EmpleadoId, @Fecha - Reporte de horario de un empleado en una fecha especifica'
 	PRINT ''
+	PRINT '		Estadisticas_Pelicula_Genero_SP @EmpleadoId, @Fecha - Reporte de estadisticas de pelicula por genero'
 END
 GO
 
@@ -87,11 +88,22 @@ BEGIN
 END
 GO
 
---DROP PROC menuFunciones_SP
---DROP PROC menuReportes_SP
---DROP PROC menuRecursosHumanos_SP
---DROP PROC menu_SP
-
---USE Flicks4U
---GO
---EXEC menu_SP
+-- Acceso a gestorFunciones
+GRANT EXECUTE
+ON OBJECT :: menuFunciones_SP TO gestorFunciones
+GRANT EXECUTE
+ON OBJECT :: menuReportes_SP TO gestorFunciones
+GRANT EXECUTE
+ON OBJECT :: menu_SP TO gestorFunciones
+-- Acceso a visualizadorReportes
+GRANT EXECUTE
+ON OBJECT :: menuReportes_SP TO visualizadorReportes
+GRANT EXECUTE
+ON OBJECT :: menu_SP TO visualizadorReportes
+-- Acceso a RRHH
+GRANT EXECUTE
+ON OBJECT :: menuRecursosHumanos_SP TO RRHH
+GRANT EXECUTE
+ON OBJECT :: menuReportes_SP TO RRHH
+GRANT EXECUTE
+ON OBJECT :: menu_SP TO RRHH

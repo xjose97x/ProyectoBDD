@@ -162,7 +162,7 @@ BEGIN
 			SET @horaInicio = (SELECT HoraInicio FROM Funciones.HorarioEmpleadoParaGestor WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
 			SET @horaFin = (SELECT HoraFin FROM Funciones.HorarioEmpleadoParaGestor WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
 
-			IF (CONVERT(TIME(0), @FECHA_INICIO) > @horaInicio AND  CONVERT(TIME(0), @FECHA_FIN) < @horaFin)
+			IF (CONVERT(TIME(0), @FECHA_INICIO) >= @horaInicio AND  CONVERT(TIME(0), @FECHA_FIN) <= @horaFin)
 				AND NOT EXISTS (SELECT * FROM Funciones.Funcion
 								WHERE (EmpleadoLimpiezaId = @ID_EMPLEADO OR EmpleadoProyecionId = @ID_EMPLEADO)
 								AND (FechaInicio <= @FECHA_FIN) AND (@FECHA_INICIO <= FechaFin))
