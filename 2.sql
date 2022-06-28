@@ -39,7 +39,7 @@ BEGIN
 		ELSE
 			IF EXISTS (SELECT * FROM Funciones.Funcion
 						WHERE SalaId = @ID_SALA
-						AND @FECHA_INICIO >= FechaInicio AND @FECHA_FIN <= FechaFin)
+						AND (FechaInicio <= @FECHA_FIN) AND (@FECHA_INICIO <= FechaFin))
 				SET @RESULTADO = 'No disponible'
 			ELSE
 				SET @RESULTADO = 'Disponible'
@@ -161,11 +161,11 @@ BEGIN
 			DECLARE @horaFin TIME(0)
 			SET @horaInicio = (SELECT HoraInicio FROM Funciones.HorarioEmpleadoParaGestor WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
 			SET @horaFin = (SELECT HoraFin FROM Funciones.HorarioEmpleadoParaGestor WHERE EmpleadoId = @ID_EMPLEADO AND NumeroDia = @dayNumber)
-			
+
 			IF (CONVERT(TIME(0), @FECHA_INICIO) > @horaInicio AND  CONVERT(TIME(0), @FECHA_FIN) < @horaFin)
 				AND NOT EXISTS (SELECT * FROM Funciones.Funcion
 								WHERE (EmpleadoLimpiezaId = @ID_EMPLEADO OR EmpleadoProyecionId = @ID_EMPLEADO)
-								AND @FECHA_INICIO >= FechaInicio AND @FECHA_FIN <= FechaFin)
+								AND (FechaInicio <= @FECHA_FIN) AND (@FECHA_INICIO <= FechaFin))
 				SET @RESULTADO = 'Disponible'
 			ELSE
 				SET @RESULTADO = 'No disponible'
