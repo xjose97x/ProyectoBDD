@@ -1,18 +1,35 @@
 USE master
 GO
 
-CREATE LOGIN administrador WITH PASSWORD = N'flicks4uEcuador2022'
-GO
+-- **** CREACIÓN DE LOGINS ****
+-- Creación login administrador
+IF NOT EXISTS(SELECT name FROM sys.syslogins
+			  WHERE NAME = 'administrador')
+	CREATE LOGIN administrador WITH PASSWORD = N'flicks4uEcuador2022'
 
-CREATE LOGIN gestorFunciones WITH PASSWORD = N'salasCineFlicks4uEcuador'
-GO
+-- Creación login gestorFunciones
+IF NOT EXISTS(SELECT name FROM sys.syslogins
+			  WHERE NAME = 'gestorFunciones')
+	CREATE LOGIN gestorFunciones WITH PASSWORD = N'salasCineFlicks4uEcuador'
 
-CREATE LOGIN recursosHumanos WITH PASSWORD = N'recursosHumanosFlicks4UEcuador'
-GO
+-- Creación login recursosHumanos
+IF NOT EXISTS(SELECT name FROM sys.syslogins
+			  WHERE NAME = 'recursosHumanos')
+	CREATE LOGIN recursosHumanos WITH PASSWORD = N'recursosHumanosFlicks4UEcuador'
 
-CREATE LOGIN visualizadorReportes WITH PASSWORD = N'visulizadorFlicks4UEcuador'
-GO
+-- Creación login visualizadorReportes
+IF NOT EXISTS(SELECT name FROM sys.syslogins
+			  WHERE NAME = 'visualizadorReportes')
+	CREATE LOGIN visualizadorReportes WITH PASSWORD = N'visulizadorFlicks4UEcuador'
 
+
+-- **** CREACIÓN DE BASE DE DATOS ****
+IF(DB_ID('Flicks4U') IS NOT NULL)
+BEGIN
+	alter database Flicks4U set single_user with rollback immediate
+	DROP DATABASE Flicks4U
+END
+GO
 
 CREATE DATABASE Flicks4U
 GO
@@ -20,43 +37,72 @@ GO
 USE Flicks4U
 GO
 
---Tipo de datos--
-CREATE TYPE dbo.email
+-- **** CREACIÓN DE TIPOS DE DATOS Y REGLAS ****
+
+-- Creación de tipo de dato email
+IF (TYPE_ID('email') IS NOT NULL)
+    DROP TYPE email
+GO
+
+CREATE TYPE email
 FROM nvarchar(50) NOT NULL
 GO
 Create Rule ck_email
 as @email LIKE '%@%.%'
 GO
-sp_bindrule ck_email,'dbo.email'
+sp_bindrule ck_email,'email'
 GO
 
-CREATE TYPE dbo.phoneNumber
+--Creación de tipo de dato phoneNumber
+IF (TYPE_ID('phoneNumber') IS NOT NULL)
+    DROP TYPE phoneNumber
+GO
+
+CREATE TYPE phoneNumber
 FROM nvarchar(50) NOT NULL
 GO
 Create Rule ck_phoneNumber
 as @phoneNumber LIKE '+%[0-9]% %[0-9]%'
 GO
-sp_bindrule ck_phoneNumber,'dbo.phoneNumber'
+sp_bindrule ck_phoneNumber,'phoneNumber'
 GO
 
-CREATE TYPE dbo.gender
+--Creación de tipo de dato gender
+IF (TYPE_ID('gender') IS NOT NULL)
+    DROP TYPE phoneNumber
+GO
+IF (TYPE_ID('gender') IS NOT NULL)
+    DROP TYPE phoneNumber
+GO
+
+CREATE TYPE gender
 FROM char(1) NOT NULL
 GO
 Create Rule ck_gender
 as @gender IN ('M', 'F', 'O')
 GO
-sp_bindrule ck_gender,'dbo.gender'
+sp_bindrule ck_gender,'gender'
 GO
 
-CREATE SCHEMA RecursosHumanos
+--Creación de Esquema RecursosHumanos
+IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'RecursosHumanos')
+    EXEC( 'CREATE SCHEMA RecursosHumanos' );
 GO
 
-CREATE SCHEMA Funciones
+--Creación de Esquema Funciones
+IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'Funciones')
+	EXEC( 'CREATE SCHEMA Funciones' );
 GO
 
-CREATE SCHEMA Reportes
+--Creación de Esquema Reportes
+IF NOT EXISTS (SELECT 1 FROM sys.schemas WHERE name = 'Reportes')
+	EXEC( 'CREATE SCHEMA Reportes' );
 GO
 
+-- **** CREACIÓN DE TABLAS ****
+-- Creación de tabla Empleado
+IF(OBJECT_ID('RecursosHumanos.Empleado') IS NOT NULL)
+	DROP TABLE RecursosHumanos.Empleado
 CREATE TABLE RecursosHumanos.Empleado
 (
 	Id SMALLINT IDENTITY (1, 1),
@@ -82,6 +128,9 @@ CREATE TABLE RecursosHumanos.Empleado
 )
 GO
 
+-- Creación de tabla HorarioLaboral
+IF(OBJECT_ID('RecursosHumanos.HorarioLaboral') IS NOT NULL)
+	DROP TABLE RecursosHumanos.HorarioLaboral
 CREATE TABLE RecursosHumanos.HorarioLaboral
 (
 	EmpleadoId SMALLINT NOT NULL,
@@ -95,6 +144,9 @@ CREATE TABLE RecursosHumanos.HorarioLaboral
 )
 GO
 
+-- Creación de tabla Pelicula
+IF(OBJECT_ID('Funciones.Pelicula') IS NOT NULL)
+	DROP TABLE Funciones.Pelicula
 CREATE TABLE Funciones.Pelicula
 (
 	Id INT IDENTITY (1,1),
@@ -113,6 +165,9 @@ CREATE TABLE Funciones.Pelicula
 )
 GO
 
+-- Creación de tabla Sala
+IF(OBJECT_ID('Funciones.Sala') IS NOT NULL)
+	DROP TABLE Funciones.Sala
 CREATE TABLE Funciones.Sala
 (
 	Id TINYINT IDENTITY (1,1),
@@ -125,6 +180,9 @@ CREATE TABLE Funciones.Sala
 )
 GO
 
+-- Creación de tabla Funcion
+IF(OBJECT_ID('Funciones.Funcion') IS NOT NULL)
+	DROP TABLE Funciones.Funcion
 CREATE TABLE Funciones.Funcion
 (
 	Id INT identity (1,1),
@@ -142,41 +200,65 @@ CREATE TABLE Funciones.Funcion
 )
 GO
 
+-- Creación de Sinónimo EmpleadoParaGestor
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'EmpleadoParaGestor')
+	DROP SYNONYM EmpleadoParaGestor
 CREATE SYNONYM EmpleadoParaGestor FOR RecursosHumanos.Empleado
-GO
-
-CREATE SYNONYM HorarioEmpleadoParaGestor FOR RecursosHumanos.HorarioLaboral
 GO
 
 ALTER SCHEMA Funciones TRANSFER OBJECT :: EmpleadoParaGestor
 GO
 
+-- Creación de Sinónimo HorarioEmpleadoParaGestor
+IF  EXISTS (SELECT * FROM sys.synonyms WHERE NAME = 'HorarioEmpleadoParaGestor')
+	DROP SYNONYM HorarioEmpleadoParaGestor
+CREATE SYNONYM HorarioEmpleadoParaGestor FOR RecursosHumanos.HorarioLaboral
+GO
+
 ALTER SCHEMA Funciones TRANSFER OBJECT :: HorarioEmpleadoParaGestor
 GO
 
-
-CREATE USER [administrador] FOR LOGIN [administrador] WITH DEFAULT_SCHEMA=[dbo]
+-- **** CREACIÓN DE USUARIOS ****
+-- Creación de usuario administrador
+IF DATABASE_PRINCIPAL_ID('administrador') IS NULL
+BEGIN
+    CREATE USER [administrador] FOR LOGIN [administrador] WITH DEFAULT_SCHEMA=[dbo]
+END
 GO
 
-CREATE USER [gestorFunciones] FOR LOGIN [gestorFunciones] WITH DEFAULT_SCHEMA=[Funciones]
+-- Creación de usuario gestorFunciones
+IF DATABASE_PRINCIPAL_ID('gestorFunciones') IS NULL
+BEGIN
+	CREATE USER [gestorFunciones] FOR LOGIN [gestorFunciones] WITH DEFAULT_SCHEMA=[Funciones]
+END
 GO
 
-CREATE USER [RRHH] FOR LOGIN [recursosHumanos] WITH DEFAULT_SCHEMA=[RecursosHumanos]
+-- Creación de usuario RRHH
+IF DATABASE_PRINCIPAL_ID('RRHH') IS NULL
+BEGIN
+	CREATE USER [RRHH] FOR LOGIN [recursosHumanos] WITH DEFAULT_SCHEMA=[RecursosHumanos]
+END
 GO
 
-CREATE USER [visualizadorReportes] FOR LOGIN visualizadorReportes WITH DEFAULT_SCHEMA=[Reportes]
+-- Creación de usuario visualizadorReportes
+IF DATABASE_PRINCIPAL_ID('visualizadorReportes') IS NULL
+BEGIN
+	CREATE USER [visualizadorReportes] FOR LOGIN visualizadorReportes WITH DEFAULT_SCHEMA=[Reportes]
+END
 GO
 
+-- **** ASIGNACIÓN DE PERMISOS ****
 -- Asignación de permiso a administrador como db_owner.
 EXEC sp_addrolemember N'db_owner', N'administrador'
 GO
 
--- Asignación de permiso a gestor de funciones de cine.
+-- Asignación de permisos a gestor de funciones de cine.
 GRANT SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: Funciones
 TO gestorFunciones
 GO
 
+-- Asignación de permisos a RRHH
 DENY SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: Funciones
 TO RRHH
@@ -187,6 +269,9 @@ DENY SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: Funciones
 TO visualizadorReportes
 CASCADE
+
+-- Asignación de permisos a sinónimo EmpleadoParaGestor
+GRANT SELECT ON Funciones.EmpleadoParaGestor TO gestorFunciones
 GO
 
 -- Asignación de permiso a visualizador de reportes.
@@ -198,6 +283,9 @@ GO
 DENY SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: Reportes
 TO gestorFunciones
+
+-- Asignación de permisos a sinónimo HorarioEmpleadoParaGestor
+GRANT SELECT ON Funciones.HorarioEmpleadoParaGestor TO gestorFunciones
 GO
 
 
@@ -242,3 +330,7 @@ GO
 DENY SELECT ON Funciones.HorarioEmpleadoParaGestor TO RRHH
 GO
 
+-- Asignación de permisos para ejecutar stored procedures
+GRANT EXECUTE TO gestorFunciones
+GRANT EXECUTE TO RRHH
+GRANT EXECUTE TO visualizadorReportes
