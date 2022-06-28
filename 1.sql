@@ -320,6 +320,9 @@ GO
 DENY SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: Reportes
 TO gestorFunciones
+
+-- Asignación de permisos a sinónimo HorarioEmpleadoParaGestor
+GRANT SELECT ON Funciones.HorarioEmpleadoParaGestor TO gestorFunciones
 GO
 
 DENY SELECT, INSERT, DELETE, UPDATE
