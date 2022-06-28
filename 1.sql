@@ -265,19 +265,35 @@ TO RRHH
 CASCADE
 GO
 
+DENY SELECT, INSERT, DELETE, UPDATE
+ON SCHEMA :: Funciones
+TO visualizadorReportes
+CASCADE
+
 -- Asignación de permisos a sinónimo EmpleadoParaGestor
 GRANT SELECT ON Funciones.EmpleadoParaGestor TO gestorFunciones
 GO
 
-DENY SELECT ON Funciones.EmpleadoParaGestor TO RRHH
+-- Asignación de permiso a visualizador de reportes.
+GRANT SELECT, INSERT, DELETE, UPDATE
+ON SCHEMA :: Reportes
+TO visualizadorReportes
 GO
+
+DENY SELECT, INSERT, DELETE, UPDATE
+ON SCHEMA :: Reportes
+TO gestorFunciones
 
 -- Asignación de permisos a sinónimo HorarioEmpleadoParaGestor
 GRANT SELECT ON Funciones.HorarioEmpleadoParaGestor TO gestorFunciones
 GO
 
-DENY SELECT ON Funciones.HorarioEmpleadoParaGestor TO RRHH
+
+DENY SELECT, INSERT, DELETE, UPDATE
+ON SCHEMA :: Reportes
+TO RRHH
 GO
+
 
 -- Asignación de permisos a gestor de recursos humanos.
 GRANT SELECT, INSERT, DELETE, UPDATE
@@ -288,6 +304,30 @@ GO
 DENY SELECT, INSERT, DELETE, UPDATE
 ON SCHEMA :: RecursosHumanos
 TO gestorFunciones
+GO
+
+DENY SELECT, INSERT, DELETE, UPDATE
+ON SCHEMA :: RecursosHumanos
+TO RRHH
+GO
+
+-- Asignación de permisos a sinónimo para gestor de funciones.
+GRANT SELECT ON Funciones.EmpleadoParaGestor TO gestorFunciones
+GO
+
+GRANT SELECT ON Funciones.HorarioEmpleadoParaGestor TO gestorFunciones
+GO
+
+DENY SELECT ON Funciones.EmpleadoParaGestor TO RRHH
+GO
+
+DENY SELECT ON Funciones.EmpleadoParaGestor to visualizadorReportes
+GO
+
+DENY SELECT ON Funciones.HorarioEmpleadoParaGestor to visualizadorReportes
+GO
+
+DENY SELECT ON Funciones.HorarioEmpleadoParaGestor TO RRHH
 GO
 
 -- Asignación de permisos para ejecutar stored procedures

@@ -156,17 +156,3 @@ BEGIN
 	END CATCH
 END
 GO
-
-CREATE PROC Estadisticas_Pelicula_Genero_SP
-(@Genero varchar(14))
-AS
-SELECT DISTINCT p.Nombre, p.Duracion as 'Duración', COUNT(f.PeliculaId) as 'Salas asignadas',
-SUM(DATEDIFF(MINUTE,f.FechaInicio, f.FechaFin) - 35) as 'Tiempo reproducida',
-COUNT(f.Fechainicio) * 35 as 'Tiempo muerto (limpieza, avances)',
-SUM(DATEDIFF(MINUTE,f.FechaInicio, f.FechaFin)) AS 'Tiempo total acumulado'
-FROM Funciones.Pelicula as p
-inner join Funciones.Funcion as f on f.PeliculaId = p.Id
-inner join Funciones.Sala as s on s.Id = f.SalaId
-WHERE p.Genero = 'Comedia'
-GROUP BY p.Nombre, p.Duracion, p.Genero, f.SalaId
-GO

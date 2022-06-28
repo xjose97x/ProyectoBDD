@@ -4,7 +4,7 @@ USE Flicks4U
 GO
 
 --Reporte de funciones en una fecha especifica
-CREATE PROC FuncionesDia_SP
+CREATE PROC Reportes.Funciones_Dia_SP
 (@Fecha DATE)
 AS
 BEGIN
@@ -24,7 +24,7 @@ END
 --	--Genero, Cantidad En cartelera, Cantidad Fuera de cartelera, Total Tiempo en Pantalla
 
 --Horario de un empleado en una fecha especifica
-CREATE PROC HorarioEmpleado_SP
+CREATE PROC Reportes.Horario_Empleado_SP
 (@EmpleadoId INT, @Fecha DATE)
 AS
 BEGIN
@@ -34,5 +34,20 @@ BEGIN
 	WHERE (EmpleadoLimpiezaId = @EmpleadoId OR EmpleadoProyecionId = @EmpleadoId)
 		AND CAST(FF.FechaInicio AS DATE) = @Fecha
 END
+
+-- Permite recuperar las estadísticas de una película en base a su género.
+CREATE PROC Reportes.Estadisticas_Pelicula_Genero_SP
+(@Genero varchar(14))
+AS
+SELECT DISTINCT p.Nombre, p.Duracion as 'Duración', COUNT(f.PeliculaId) as 'Salas asignadas',
+SUM(DATEDIFF(MINUTE,f.FechaInicio, f.FechaFin) - 35) as 'Tiempo reproducida',
+COUNT(f.Fechainicio) * 35 as 'Tiempo muerto (limpieza, avances)',
+SUM(DATEDIFF(MINUTE,f.FechaInicio, f.FechaFin)) AS 'Tiempo total acumulado'
+FROM Funciones.Pelicula as p
+inner join Funciones.Funcion as f on f.PeliculaId = p.Id
+inner join Funciones.Sala as s on s.Id = f.SalaId
+WHERE p.Genero = 'Comedia'
+GROUP BY p.Nombre, p.Duracion, p.Genero, f.SalaId
+GO
 
 --EXEC HorarioEmpleado_SP 1, '2022-06-21'
