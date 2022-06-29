@@ -2,6 +2,10 @@ USE Flicks4U
 GO
 
 -- Menu de funcionalidades relacionadas al esquema de funciones
+IF (OBJECT_ID('menuFunciones_SP') IS NOT NULL)
+  DROP PROCEDURE menuFunciones_SP
+GO
+
 CREATE PROCEDURE menuFunciones_SP
 AS
 BEGIN
@@ -21,6 +25,10 @@ END
 GO
 
 -- Menu de funcionalidades relacionadas al esquema de recursos humanos
+IF (OBJECT_ID('menuRecursosHumanos_SP') IS NOT NULL)
+  DROP PROCEDURE menuRecursosHumanos_SP
+GO
+
 CREATE PROCEDURE menuRecursosHumanos_SP
 AS
 BEGIN
@@ -32,23 +40,34 @@ BEGIN
 	PRINT ''
 	PRINT '		RecursosHumanos.Despedir_Empleado_SP @IdEmpleado - Remueve un empleado existente'
 	PRINT ''
+	PRINT '		RecursosHumanos.Modificar_Horario_Empleado @IdEmpleado, @NumeroDia, @HoraInicio, @HoraFin - Actualiza el horario laboral de un empleado'
+	PRINT ''
 END
 GO
 	
 -- Menu de reportes
+IF (OBJECT_ID('menuReportes_SP') IS NOT NULL)
+  DROP PROCEDURE menuReportes_SP
+GO
+
 CREATE PROCEDURE menuReportes_SP
 AS
 BEGIN
 	PRINT 'REPORTES'
 	PRINT ''
-	PRINT '		FuncionesDia_SP @Fecha - Reporte de Funciones en un día especifico'
+	PRINT '		FuncionesDia_SP @Fecha - Reporte de Funciones en un dï¿½a especifico'
 	PRINT ''
 	PRINT '		HorarioEmpleado_SP @EmpleadoId, @Fecha - Reporte de horario de un empleado en una fecha especifica'
 	PRINT ''
+	PRINT '		Estadisticas_Pelicula_Genero_SP @EmpleadoId, @Fecha - Reporte de estadisticas de pelicula por genero'
 END
 GO
 
 -- Procedimiento almacenado encargado de imprimir el menu
+IF (OBJECT_ID('menu_SP') IS NOT NULL)
+  DROP PROCEDURE menu_SP
+GO
+
 CREATE PROCEDURE menu_SP
 AS
 BEGIN
@@ -87,11 +106,22 @@ BEGIN
 END
 GO
 
---DROP PROC menuFunciones_SP
---DROP PROC menuReportes_SP
---DROP PROC menuRecursosHumanos_SP
---DROP PROC menu_SP
-
---USE Flicks4U
---GO
---EXEC menu_SP
+-- Acceso a gestorFunciones
+GRANT EXECUTE
+ON OBJECT :: menuFunciones_SP TO gestorFunciones
+GRANT EXECUTE
+ON OBJECT :: menuReportes_SP TO gestorFunciones
+GRANT EXECUTE
+ON OBJECT :: menu_SP TO gestorFunciones
+-- Acceso a visualizadorReportes
+GRANT EXECUTE
+ON OBJECT :: menuReportes_SP TO visualizadorReportes
+GRANT EXECUTE
+ON OBJECT :: menu_SP TO visualizadorReportes
+-- Acceso a RRHH
+GRANT EXECUTE
+ON OBJECT :: menuRecursosHumanos_SP TO RRHH
+GRANT EXECUTE
+ON OBJECT :: menuReportes_SP TO RRHH
+GRANT EXECUTE
+ON OBJECT :: menu_SP TO RRHH

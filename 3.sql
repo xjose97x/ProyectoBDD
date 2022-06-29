@@ -1,6 +1,7 @@
 USE Flicks4U
 GO
 
+-- Insercion de peliculas base
 EXEC Funciones.Insertar_Pelicula_SP 'Up', 'Un hombre amargado le cuelga globos a su casa y viaja a Sudamérica', 'Comedia', '01:47:00', 'https://disney.com/up/up.jpg', 'digital', '2010-05-05', '2010-07-05'
 EXEC Funciones.Insertar_Pelicula_SP 'Jurassic World: Dominion', 'La última parte en la saga épica de Jurassic Park', 'Aventura', '02:31:00', 'https://universalapi.com/jurassicworld/dominion/poster.jpg', 'digital', '2022-04-07', '2022-06-07'
 EXEC Funciones.Insertar_Pelicula_SP 'Men', 'Una mujer tiene experiencias extrañas cuando se va de vacaciones para recuperarse de una tragedia', 'Terror', '02:01:00', 'https://a24api.com/men/men.jpg', '35mm', '2022-06-05', '2022-08-05'
@@ -14,6 +15,8 @@ EXEC Funciones.Insertar_Pelicula_SP 'Thor: Amor y Trueno', 'La película encuent
 EXEC Funciones.Insertar_Pelicula_SP 'El Gato con Botas: El último deseo', 'El último deseo sigue las nuevas andanzas del temerario y valiente felino. En esta ocasión, el campestre personaje descubrirá el precio de su pasión por el peligro y el no tenerle miedo a la muerte.', 'Aventura', '01:40:00', 'https://universal.com/dreamworks/pussinboots2/poster.jpg', 'IMAX', '2022-10-05', '2022-12-05'
 EXEC Funciones.Insertar_Pelicula_SP 'Crimes of the Future', 'En un futuro no muy lejano la humanidad está aprendiendo a adaptarse a su entorno sintético, en un mundo donde no existe el dolor. Esta evolución lleva a los humanos más allá de su estado natural y hacia una metamorfosis, alterando su estructura biológica.', 'Terror', '01:47:00', 'https://telefilm.com/international/crimesofthefuture/poster.jpg', '35mm', '2022-05-22', '2022-07-22'
 GO
+
+-- Insercion de salas base
 EXEC Funciones.Crear_Sala_SP 250, 'REG', 'D'
 EXEC Funciones.Crear_Sala_SP 200, 'REG', 'D'
 EXEC Funciones.Crear_Sala_SP 180, 'REG', 'A'
@@ -30,18 +33,18 @@ EXEC Funciones.Crear_Sala_SP 90, '4D', 'D'
 EXEC Funciones.Crear_Sala_SP 100, 'VBOX', 'D'
 EXEC Funciones.Crear_Sala_SP 90, 'VBOX', 'D'
 
+-- Insercion de empleados base
 EXEC RecursosHumanos.Insertar_Empleado_SP '1700000000', 'Pepito', 'De Los Palotes', 'pepito@delospalotes.com', '+593 4512312', 'M', '2000-01-01', 'Av. Granados E4-12', 450.00, 'Limpieza'
 EXEC RecursosHumanos.Insertar_Empleado_SP '1700000002', 'Patricio', 'Estrella', 'patricioe@gmail.com', '+593 4512232', 'M', '1997-01-16', 'Av. La Prensa E4-12', 500.00, 'Limpieza'
 
 EXEC RecursosHumanos.Insertar_Empleado_SP '1200000000', 'Juan Carlos', 'Bodoque', 'juancarlos@bodoque.com', '+593 987654421', 'M', '1997-01-01', 'Av. Amazonas E4-12', 700.00, 'Proyeccion'
 EXEC RecursosHumanos.Insertar_Empleado_SP '1200000003', 'Miguel', 'Brito', 'miguelb@gmail.com', '+593 98123451', 'M', '2000-12-12', 'Av. 10 de Agosto E4-12', 800.00, 'Proyeccion'
 
---Inserción de funciones
-EXEC Funciones.Crear_Funcion_SP '20220619 10:30:00 AM', 1, 1, 1, 2
---EXEC CrearFuncion_SP '20220622 10:30:00 AM', 1, 1, 1, 2 --TODO: Bug al insertar funciones a la misma hora en dias diferentes
+--Inserción de funciones base
+EXEC Funciones.Crear_Funcion_SP '20220620 10:30:00 AM', 1, 1, 1, 3
+EXEC Funciones.Crear_Funcion_SP '20220620 01:30:00 PM', 1, 1, 1, 3
 
-EXEC Funciones.Crear_Funcion_SP '20220619 01:30:00 PM', 1, 1, 1, 2
+EXEC Funciones.Crear_Funcion_SP '20220620 08:00:00 AM', 2, 2, 2, 4
+EXEC Funciones.Crear_Funcion_SP '20220620 11:30:00 AM', 2, 2, 2, 4
 
-EXEC Funciones.Crear_Funcion_SP '20220619 01:30:00 PM', 2, 2, 3, 4
-EXEC Funciones.Crear_Funcion_SP '20220619 03:30:00 PM', 2, 2, 3, 4
 GO
