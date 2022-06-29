@@ -190,7 +190,7 @@ BEGIN
 		SET NOCOUNT ON
 		IF NOT EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @ID_EMPLEADO)
 			THROW 60000, 'El empleado no existe.', 1; 
-		ELSE IF EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @ID_EMPLEADO AND FechaEgreso IS NULL)
+		ELSE IF EXISTS(SELECT * FROM RecursosHumanos.Empleado WHERE Id = @ID_EMPLEADO AND FechaEgreso IS NOT NULL)
 			THROW 60000, 'El empleado ya fue despedido.', 1; 
 		ELSE
 			UPDATE RecursosHumanos.Empleado
